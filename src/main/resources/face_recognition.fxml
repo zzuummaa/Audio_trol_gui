@@ -1,38 +1,95 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.collections.FXCollections?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.*?>
 <?import java.lang.String?>
-<VBox fx:controller="FaceRecognition" xmlns:fx="http://javafx.com/fxml">
-<padding><Insets top="24" right="24" bottom="8" left="24"/></padding>
+<?import javafx.collections.FXCollections?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Group?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
 
-    <VBox fx:id="vbox">
-        <HBox fx:id="high" alignment="CENTER_RIGHT">
-            <Label fx:id="lbFPS" text="FPS "/>
-        </HBox>
+<BorderPane xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="FaceRecognition">
+    <padding><Insets bottom="8" /></padding>
 
-        <GridPane>
+    <top>
+        <MenuBar>
+            <menus>
+                <Menu text="File">
+                    <items>
+                        <MenuItem text="Exit" />
+                    </items>
+                </Menu>
+                <Menu text="Edit">
+                    <items>
+                        <MenuItem text="Copy" />
+                        <MenuItem text="Cut" />
+                        <MenuItem text="Paste" />
+                    </items>
+                </Menu>
+                <Menu text="Help">
+                    <items>
+                        <MenuItem text="About" />
+                    </items>
+                </Menu>
+            </menus>
+        </MenuBar>
+    </top>
 
-            <Label text="Источник видео:" GridPane.columnIndex="0" GridPane.rowIndex="0" alignment="CENTER"><GridPane.margin><Insets right="16" bottom="8"/></GridPane.margin></Label>
-            <ComboBox fx:id="cbVideoSourceType" prefWidth="360" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                <GridPane.margin><Insets right="16" bottom="8"/></GridPane.margin>
-                <items>
-                    <FXCollections fx:id="videoSourceTypes" fx:factory="observableArrayList">
-                        <String fx:value="Камера" />
-                        <String fx:value="Файл или URL" />
-                    </FXCollections>
-                </items>
-            </ComboBox>
-            <Label text="URL или путь:" GridPane.columnIndex="0" GridPane.rowIndex="1" alignment="CENTER"><GridPane.margin><Insets right="16" bottom="8"/></GridPane.margin></Label>
-            <TextField fx:id="tfURL" prefWidth="360" GridPane.columnIndex="1" GridPane.rowIndex="1"><GridPane.margin><Insets right="16" bottom="8"/></GridPane.margin></TextField>
-            <Button fx:id="btLoad" text="Загрузить" GridPane.columnIndex="2" GridPane.rowIndex="1"><GridPane.margin><Insets right="16" bottom="8"/></GridPane.margin></Button>
+    <center>
+        <VBox fx:id="vbox">
+            <padding><Insets left="12" right="24" top="12" /></padding>
+            <HBox fx:id="high" alignment="CENTER_RIGHT">
+                <Label fx:id="lbFPS" text="FPS " />
+            </HBox>
 
-        </GridPane>
+            <GridPane>
 
-        <ImageView fx:id="imageView" fitHeight="500" fitWidth="600"/>
-    </VBox>
+                <Label alignment="CENTER" text="Источник видео:" GridPane.columnIndex="0" GridPane.rowIndex="0"><GridPane.margin><Insets bottom="8" right="16" /></GridPane.margin></Label>
+                <ComboBox fx:id="cbVideoSourceType" prefWidth="360" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                    <GridPane.margin><Insets bottom="8" right="16" /></GridPane.margin>
+                    <items>
+                        <FXCollections fx:id="videoSourceTypes" fx:factory="observableArrayList">
+                            <String fx:value="Камера" />
+                            <String fx:value="Файл или URL" />
+                        </FXCollections>
+                    </items>
+                </ComboBox>
+                <Label alignment="CENTER" text="URL или путь:" GridPane.columnIndex="0" GridPane.rowIndex="1"><GridPane.margin><Insets bottom="8" right="16" /></GridPane.margin></Label>
+                <TextField fx:id="tfURL" prefWidth="360" GridPane.columnIndex="1" GridPane.rowIndex="1"><GridPane.margin><Insets bottom="8" right="16" /></GridPane.margin></TextField>
+                <Button fx:id="btLoad" text="Загрузить" GridPane.columnIndex="2" GridPane.rowIndex="1"><GridPane.margin><Insets bottom="8" right="16" /></GridPane.margin></Button>
+            <columnConstraints>
+               <ColumnConstraints />
+               <ColumnConstraints />
+               <ColumnConstraints />
+            </columnConstraints>
+            <rowConstraints>
+               <RowConstraints />
+               <RowConstraints />
+            </rowConstraints>
 
-</VBox>
+            </GridPane>
+
+            <ImageView fx:id="imageView" fitHeight="500" fitWidth="600" />
+        </VBox>
+    </center>
+   <left>
+       <ToolBar orientation="VERTICAL">
+           <Group><Button rotate="-90.0" text="Видео" /></Group>
+       </ToolBar>
+
+   </left>
+
+</BorderPane>

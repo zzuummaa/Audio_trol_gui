@@ -6,6 +6,7 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Side;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -18,6 +19,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Pair;
+import org.controlsfx.control.HiddenSidesPane;
 import org.controlsfx.control.NotificationPane;
 import org.controlsfx.control.Notifications;
 import ru.zuma.rx.RxClassifier;
@@ -44,9 +46,6 @@ public class FaceRecognition extends Application implements Initializable {
     private static volatile VideoSourceInterface videoSource;
     private static volatile RxVideoSource2 rxVideoSource;
     private static volatile FPSCounter fpsCounter;
-
-    @FXML
-    private VBox vbox;
 
     @FXML
     private TextField tfURL;

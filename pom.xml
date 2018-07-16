@@ -48,7 +48,7 @@
                 </includes>
                 <!-- relative to target/classes
                      i.e. ${project.build.outputDirectory} -->
-                <targetPath>${basedir}/target/resources</targetPath>
+                <targetPath>${basedir}/target/classes</targetPath>
             </resource>
 
             <resource>
