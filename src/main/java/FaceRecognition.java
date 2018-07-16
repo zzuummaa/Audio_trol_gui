@@ -167,8 +167,21 @@ public class FaceRecognition extends Application implements Initializable {
             });
         }));
 
+        double[] delay = new double[1];
+        final double step = 0.25;
         videoSource.subscribe((mat) -> {
+
             fpsCounter.countdown();
+
+            double videoSourceFPS = videoSource.getFrameRate();
+            if (videoSourceFPS != 0) {
+                if (fpsCounter.getFPS() < videoSourceFPS) {
+                    delay[0] -= delay[0] == 0 ? 0 : step;
+                } else {
+                    delay[0] += step;
+                }
+                Thread.sleep((long) delay[0]);
+            }
 
             Platform.runLater(() -> {
                 lbFPS.setText("FPS " + String.format("%.1f", fpsCounter.getFPS()));
