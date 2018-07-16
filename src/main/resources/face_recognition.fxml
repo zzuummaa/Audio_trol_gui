@@ -7,10 +7,11 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.image.ImageView?>
@@ -22,7 +23,6 @@
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="FaceRecognition">
-    <padding><Insets bottom="8" /></padding>
 
     <top>
         <MenuBar>
@@ -49,47 +49,71 @@
     </top>
 
     <center>
-        <VBox fx:id="vbox">
-            <padding><Insets left="12" right="24" top="12" /></padding>
-            <HBox fx:id="high" alignment="CENTER_RIGHT">
-                <Label fx:id="lbFPS" text="FPS " />
-            </HBox>
+        <HBox>
+            <VBox fx:id="vbLeftDropMenu" prefHeight="-Infinity" prefWidth="250">
+                <padding><Insets bottom="12" left="12" right="12" top="12" /></padding>
+                <Button text="Добавить">
+               <VBox.margin>
+                  <Insets bottom="12.0" />
+               </VBox.margin></Button>
+                <ListView fx:id="lvVideoSources" prefWidth="-Infinity" stylesheets="@list_view_style.css"/>
+            <HBox.margin>
+               <Insets />
+            </HBox.margin>
+            </VBox>
+            <Separator fx:id="spLeftDropMenu" orientation="VERTICAL" />
+            <VBox fx:id="vbox">
+                <padding><Insets left="12" right="12" top="12" /></padding>
+                <HBox fx:id="high" alignment="CENTER_RIGHT">
+                    <Label fx:id="lbFPS" text="FPS " />
+                </HBox>
 
-            <GridPane>
+                <GridPane>
 
-                <Label alignment="CENTER" text="Источник видео:" GridPane.columnIndex="0" GridPane.rowIndex="0"><GridPane.margin><Insets bottom="8" right="16" /></GridPane.margin></Label>
-                <ComboBox fx:id="cbVideoSourceType" prefWidth="360" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                    <GridPane.margin><Insets bottom="8" right="16" /></GridPane.margin>
-                    <items>
-                        <FXCollections fx:id="videoSourceTypes" fx:factory="observableArrayList">
-                            <String fx:value="Камера" />
-                            <String fx:value="Файл или URL" />
-                        </FXCollections>
-                    </items>
-                </ComboBox>
-                <Label alignment="CENTER" text="URL или путь:" GridPane.columnIndex="0" GridPane.rowIndex="1"><GridPane.margin><Insets bottom="8" right="16" /></GridPane.margin></Label>
-                <TextField fx:id="tfURL" prefWidth="360" GridPane.columnIndex="1" GridPane.rowIndex="1"><GridPane.margin><Insets bottom="8" right="16" /></GridPane.margin></TextField>
-                <Button fx:id="btLoad" text="Загрузить" GridPane.columnIndex="2" GridPane.rowIndex="1"><GridPane.margin><Insets bottom="8" right="16" /></GridPane.margin></Button>
-            <columnConstraints>
-               <ColumnConstraints />
-               <ColumnConstraints />
-               <ColumnConstraints />
-            </columnConstraints>
-            <rowConstraints>
-               <RowConstraints />
-               <RowConstraints />
-            </rowConstraints>
+                    <Label alignment="CENTER" text="Источник видео:" GridPane.columnIndex="0" GridPane.rowIndex="0"><GridPane.margin><Insets bottom="8" right="16" /></GridPane.margin></Label>
+                    <ComboBox fx:id="cbVideoSourceType" prefWidth="360" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                        <GridPane.margin><Insets bottom="8" right="16" /></GridPane.margin>
+                        <items>
+                            <FXCollections fx:id="videoSourceTypes" fx:factory="observableArrayList">
+                                <String fx:value="Камера" />
+                                <String fx:value="Файл или URL" />
+                            </FXCollections>
+                        </items>
+                    </ComboBox>
+                    <Label alignment="CENTER" text="URL или путь:" GridPane.columnIndex="0" GridPane.rowIndex="1"><GridPane.margin><Insets bottom="8" right="16" /></GridPane.margin></Label>
+                    <TextField fx:id="tfURL" prefWidth="360" GridPane.columnIndex="1" GridPane.rowIndex="1"><GridPane.margin><Insets bottom="8" right="16" /></GridPane.margin></TextField>
+                    <Button fx:id="btLoad" text="Загрузить" GridPane.columnIndex="2" GridPane.rowIndex="1"><GridPane.margin><Insets bottom="8" right="16" /></GridPane.margin></Button>
+                    <columnConstraints>
+                        <ColumnConstraints />
+                        <ColumnConstraints />
+                        <ColumnConstraints />
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints />
+                        <RowConstraints />
+                    </rowConstraints>
 
-            </GridPane>
+                </GridPane>
 
-            <ImageView fx:id="imageView" fitHeight="500" fitWidth="600" />
-        </VBox>
+                <ImageView fx:id="imageView" fitHeight="500" fitWidth="600" />
+            </VBox>
+        </HBox>
     </center>
-   <left>
-       <ToolBar orientation="VERTICAL">
-           <Group><Button rotate="-90.0" text="Видео" /></Group>
-       </ToolBar>
+    <left>
+        <HBox>
+            <ToolBar orientation="VERTICAL">
+                <Group><Button fx:id="btVideo" rotate="-90.0" text="Видео" /></Group>
+            </ToolBar>
+            <Separator orientation="VERTICAL" />
+        </HBox>
+    </left>
 
-   </left>
+    <bottom>
+        <VBox>
+            <Separator prefWidth="-Infinity" />
+            <ToolBar prefWidth="-Infinity" prefHeight="16">
+            </ToolBar>
+        </VBox>
+    </bottom>
 
 </BorderPane>

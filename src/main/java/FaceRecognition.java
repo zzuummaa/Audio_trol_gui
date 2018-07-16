@@ -2,6 +2,8 @@ import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -9,13 +11,11 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Side;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Pair;
@@ -30,12 +30,16 @@ import ru.zuma.utils.ImageProcessor;
 import ru.zuma.video.CameraVideoSource;
 import ru.zuma.video.HttpVideoSource;
 import ru.zuma.video.VideoSourceInterface;
+import serialization.Serializer;
+import serialization.model.VideoSourceSettings;
+import serialization.model.VideoSourceSettingsList;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 
 import static org.bytedeco.javacpp.opencv_core.Mat;
 import static org.bytedeco.javacpp.opencv_core.RectVector;
@@ -46,6 +50,19 @@ public class FaceRecognition extends Application implements Initializable {
     private static volatile VideoSourceInterface videoSource;
     private static volatile RxVideoSource2 rxVideoSource;
     private static volatile FPSCounter fpsCounter;
+
+    @FXML
+    private ListView lvVideoSources;
+    private ObservableList<String> videoSourceItems;
+
+    @FXML
+    private VBox vbLeftDropMenu;
+
+    @FXML
+    private Separator spLeftDropMenu;
+
+    @FXML
+    private Button btVideo;
 
     @FXML
     private TextField tfURL;
@@ -79,6 +96,20 @@ public class FaceRecognition extends Application implements Initializable {
 //        webView.setPrefSize(0, 0);
 //        notificationPane = new NotificationPane(webView);
 //        vbox.getChildren().add(0, notificationPane);
+
+        VideoSourceSettingsList sourceList = Serializer.getInstance().deserializeVideoSourceSettings();
+
+        videoSourceItems = FXCollections.observableArrayList ();
+        sourceList.getItems().forEach(settings -> {
+            videoSourceItems.add(settings.getName());
+        });
+
+        btVideo.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
+            vbLeftDropMenu.setManaged(!vbLeftDropMenu.isManaged());
+            vbLeftDropMenu.setVisible(!vbLeftDropMenu.isVisible());
+            spLeftDropMenu.setVisible(!spLeftDropMenu.isVisible());
+            stage.sizeToScene();
+        });
 
         cbVideoSourceType.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue.intValue() == 0) {
