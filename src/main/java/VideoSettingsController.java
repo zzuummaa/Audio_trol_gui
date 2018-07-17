@@ -2,7 +2,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
-import javafx.scene.input.DragEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -29,7 +28,7 @@ public class VideoSettingsController implements Initializable {
 
     private Stage stage;
 
-    private Consumer<VideoSourceSettings> onOK;
+    private Consumer<VideoSourceSettings> onNewVideoSettings;
 
     private Integer storageIdx;
 
@@ -40,8 +39,8 @@ public class VideoSettingsController implements Initializable {
 
         btOk.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             VideoSourceSettings settings = apply();
-            if (onOK != null) {
-                onOK.accept(settings);
+            if (onNewVideoSettings != null) {
+                onNewVideoSettings.accept(settings);
             }
             stage.close();
         });
@@ -58,8 +57,8 @@ public class VideoSettingsController implements Initializable {
         cbVideoSourceType.getSelectionModel().selectFirst();
     }
 
-    public void setOnOK(Consumer<VideoSourceSettings> onOK) {
-        this.onOK = onOK;
+    public void setOnNewVideoSettings(Consumer<VideoSourceSettings> onNewVideoSettings) {
+        this.onNewVideoSettings = onNewVideoSettings;
     }
 
     public void setStage(Stage stage) {
@@ -67,8 +66,8 @@ public class VideoSettingsController implements Initializable {
         stage.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ENTER) {
                 VideoSourceSettings settings = apply();
-                if (onOK != null) {
-                    onOK.accept(settings);
+                if (onNewVideoSettings != null) {
+                    onNewVideoSettings.accept(settings);
                 }
                 stage.close();
             }

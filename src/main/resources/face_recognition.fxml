@@ -91,6 +91,8 @@
                     <Label alignment="CENTER" text="URL или путь:" GridPane.columnIndex="0" GridPane.rowIndex="1"><GridPane.margin><Insets bottom="8" right="16" /></GridPane.margin></Label>
                     <TextField fx:id="tfURL" prefWidth="360" GridPane.columnIndex="1" GridPane.rowIndex="1"><GridPane.margin><Insets bottom="8" right="16" /></GridPane.margin></TextField>
                     <Button fx:id="btLoad" text="Загрузить" GridPane.columnIndex="2" GridPane.rowIndex="1"><GridPane.margin><Insets bottom="8" right="16" /></GridPane.margin></Button>
+                    <Label alignment="CENTER" text="Статус:" GridPane.columnIndex="0" GridPane.rowIndex="2"><GridPane.margin><Insets bottom="8" right="16" /></GridPane.margin></Label>
+                    <Label fx:id="lbVideoPlayingStatus" prefWidth="360" GridPane.columnIndex="1" GridPane.rowIndex="2"><GridPane.margin><Insets bottom="8" right="16" /></GridPane.margin></Label>
                     <columnConstraints>
                         <ColumnConstraints />
                         <ColumnConstraints />

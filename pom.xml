@@ -75,7 +75,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>ru.zuma.LiveStreamProcessing</mainClass>
+                            <mainClass>FaceRecognition</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

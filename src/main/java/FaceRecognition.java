@@ -1,5 +1,4 @@
 import com.sun.javafx.scene.control.skin.LabeledText;
-import com.sun.javafx.scene.control.skin.ListViewSkin;
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 import javafx.application.Application;
@@ -8,7 +7,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -18,16 +16,13 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 import org.controlsfx.control.NotificationPane;
-import org.controlsfx.control.Notifications;
 import ru.zuma.rx.RxClassifier;
 import ru.zuma.rx.RxVideoSource2;
 import ru.zuma.utils.ConsoleUtil;
@@ -43,12 +38,14 @@ import serialization.model.VideoSourceSettingsList;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static java.lang.Thread.MAX_PRIORITY;
+import static org.bytedeco.javacpp.avutil.*;
 import static org.bytedeco.javacpp.opencv_core.Mat;
 import static org.bytedeco.javacpp.opencv_core.RectVector;
-import static serialization.model.VideoSourceSettings.*;
+import static serialization.model.VideoSourceSettings.SourceTypes;
 import static serialization.model.VideoSourceSettings.SourceTypes.CAMERA;
 import static serialization.model.VideoSourceSettings.SourceTypes.PATH_OR_URL;
 
@@ -58,6 +55,9 @@ public class FaceRecognition extends Application implements Initializable {
     private static volatile VideoSourceInterface videoSource;
     private static volatile RxVideoSource2 rxVideoSource;
     private static volatile FPSCounter fpsCounter;
+
+    @FXML
+    private Label lbVideoPlayingStatus;
 
     @FXML
     private MenuItem cmVideoSourcesDelete;
@@ -99,6 +99,8 @@ public class FaceRecognition extends Application implements Initializable {
     private static Stage stage;
     private NotificationPane notificationPane;
 
+    private static volatile ExecutorService executor = Executors.newSingleThreadExecutor();
+
     public static void main(String[] args) {
         launch(args);
     }
@@ -124,7 +126,7 @@ public class FaceRecognition extends Application implements Initializable {
 
         cmVideoSourcesChange.setOnAction(event -> {
             // TODO make normal double click handling
-            createVideoSettingsWindow(lvVideoSources.getSelectionModel().getSelectedIndex(), resources);
+            createVideoSettingsWindow(lvVideoSources.getSelectionModel().getSelectedIndex(), resources, false);
         });
 
         lvVideoSources.setOnKeyPressed(event -> {
@@ -146,7 +148,7 @@ public class FaceRecognition extends Application implements Initializable {
         });
 
         btAddVideo.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
-            createVideoSettingsWindow(null, resources);
+            createVideoSettingsWindow(null, resources, true);
         });
 
         btVideo.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
@@ -172,33 +174,39 @@ public class FaceRecognition extends Application implements Initializable {
     }
 
     private void playVideo(SourceTypes type, String url) {
+        executor.execute(() -> {
+            if (rxVideoSource != null) {
+                Platform.runLater(() -> lbVideoPlayingStatus.setText("Остановка старого видеопотока..."));
+                rxVideoSource.onComplete();
+            }
 
 
-        if (rxVideoSource != null) {
-            rxVideoSource.onComplete();
-        }
+            Platform.runLater(() -> lbVideoPlayingStatus.setText("Ожидание видеопотока..."));
+            if (type == CAMERA) {
+                videoSource = new CameraVideoSource(0);
+            } else if (type == PATH_OR_URL) {
+                videoSource = new HttpVideoSource(url);
+            } else {
+                throw new IllegalStateException("Unknown item");
+            }
 
-        if (type == CAMERA) {
-            videoSource = new CameraVideoSource(0);
-        } else if (type == PATH_OR_URL) {
-            videoSource = new HttpVideoSource(url);
-        } else {
-            throw new IllegalStateException("Unknown item");
-        }
+            if (!videoSource.isOpened()) {
+                Platform.runLater(() -> lbVideoPlayingStatus.setText("Не удалось открыть видеопоток"));
+//            Notifications.create()
+//                    .title("Ошибка")
+//                    .text("Не возможно открыть источник видео")
+//                    .showError();
 
-        if (!videoSource.isOpened()) {
-            Notifications.create()
-                    .title("Ошибка")
-                    .text("Не возможно открыть источник видео")
-                    .showError();
+                return;
+            }
 
-            return;
-        }
-
-        rxVideoSource = new RxVideoSource2(videoSource);
-        initVideoSource(rxVideoSource);
-        rxClassifier = ConsoleUtil.createClassifier();
-        showInImageView(rxVideoSource, videoSource, rxClassifier);
+            Platform.runLater(() -> lbVideoPlayingStatus.setText("Инициализация модели обработки..."));
+            rxVideoSource = new RxVideoSource2(videoSource);
+            initVideoSource(rxVideoSource);
+            rxClassifier = ConsoleUtil.createClassifier();
+            showInImageView(rxVideoSource, videoSource, rxClassifier);
+            Platform.runLater(() -> lbVideoPlayingStatus.setText("Видео проигрывается"));
+        });
     }
 
     private void showInImageView(RxVideoSource2 rxVideoSource, VideoSourceInterface videoSource, RxClassifier classifier) {
@@ -215,8 +223,11 @@ public class FaceRecognition extends Application implements Initializable {
             ImageMarker.markRects(pair.getKey(), pair.getValue());
             Image image = SwingFXUtils.toFXImage(ImageProcessor.toBufferedImage(pair.getKey()), null);
 
+            Platform.runLater(() -> imageView.setImage(image));
+        }, th -> {}, () -> {
             Platform.runLater(() -> {
-                imageView.setImage(image);
+                imageView.setImage(null);
+                lbVideoPlayingStatus.setText("Конец видеопотока");
             });
         });
     }
@@ -270,15 +281,20 @@ public class FaceRecognition extends Application implements Initializable {
 
     @Override
     public void start(Stage stage) throws IOException {
+        av_log_set_level(MAX_PRIORITY);
         Parent root = FXMLLoader.load(getClass().getResource("face_recognition.fxml"));
 
         stage.setOnCloseRequest(event -> {
+            System.out.println("Realise resources...");
             if (rxVideoSource != null) {
-                System.out.println("Realise resources...");
                 rxVideoSource.onComplete();
+            }
+            if (executor != null) {
+                executor.shutdownNow();
             }
 
             System.out.println("Goodbye!");
+            System.exit(0);
         });
 
         Scene scene = new Scene(root);
@@ -288,7 +304,7 @@ public class FaceRecognition extends Application implements Initializable {
         this.stage = stage;
     }
 
-    private void createVideoSettingsWindow(Integer storageIdx, ResourceBundle resources) {
+    private void createVideoSettingsWindow(Integer storageIdx, ResourceBundle resources, boolean isUpdateLV) {
         Parent root;
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("video_settings.fxml"), resources);
@@ -297,9 +313,11 @@ public class FaceRecognition extends Application implements Initializable {
             Stage newWindow = new Stage();
             controller.setStage(newWindow);
             controller.setStorageIdx(storageIdx);
-            controller.setOnOK(vss -> {
-                lvVideoSources.getItems().add(vss.getName());
-            });
+            if (isUpdateLV) {
+                controller.setOnNewVideoSettings(vss -> {
+                    lvVideoSources.getItems().add(vss.getName());
+                });
+            }
 
             newWindow.setTitle("My New Stage Title");
             newWindow.setScene(new Scene(root));
