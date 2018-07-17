@@ -7,6 +7,7 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -36,6 +37,7 @@ import ru.zuma.video.CameraVideoSource;
 import ru.zuma.video.HttpVideoSource;
 import ru.zuma.video.VideoSourceInterface;
 import serialization.Serializer;
+import serialization.model.VideoSourceSettings;
 import serialization.model.VideoSourceSettingsList;
 
 import java.io.IOException;
@@ -46,6 +48,9 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static org.bytedeco.javacpp.opencv_core.Mat;
 import static org.bytedeco.javacpp.opencv_core.RectVector;
+import static serialization.model.VideoSourceSettings.*;
+import static serialization.model.VideoSourceSettings.SourceTypes.CAMERA;
+import static serialization.model.VideoSourceSettings.SourceTypes.PATH_OR_URL;
 
 public class FaceRecognition extends Application implements Initializable {
 
@@ -53,6 +58,12 @@ public class FaceRecognition extends Application implements Initializable {
     private static volatile VideoSourceInterface videoSource;
     private static volatile RxVideoSource2 rxVideoSource;
     private static volatile FPSCounter fpsCounter;
+
+    @FXML
+    private MenuItem cmVideoSourcesDelete;
+
+    @FXML
+    private MenuItem cmVideoSourcesChange;
 
     @FXML
     private Button btAddVideo;
@@ -104,13 +115,21 @@ public class FaceRecognition extends Application implements Initializable {
             });
         }
         lvVideoSources.setItems(videoSourceItems);
-        //lvVideoSources.setContextMenu(new VideoItemContextMenu(lvVideoSources));
+
+        cmVideoSourcesDelete.setOnAction(event -> {
+            int num = lvVideoSources.getSelectionModel().getSelectedIndex();
+            Serializer.getInstance().deleteVideoSourceSettings(num);
+            videoSourceItems.remove(num);
+        });
+
+        cmVideoSourcesChange.setOnAction(event -> {
+            // TODO make normal double click handling
+            createVideoSettingsWindow(lvVideoSources.getSelectionModel().getSelectedIndex(), resources);
+        });
 
         lvVideoSources.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.DELETE) {
                 ObservableList nums = lvVideoSources.getSelectionModel().getSelectedIndices();
-                nums.forEach(i -> System.out.print(i + " "));
-                System.out.println();
                 Serializer.getInstance().deleteVideoSourceSettings(nums);
                 videoSourceItems.removeAll(lvVideoSources.getSelectionModel().getSelectedItems());
             }
@@ -119,8 +138,10 @@ public class FaceRecognition extends Application implements Initializable {
         lvVideoSources.setOnMouseClicked(event -> {
             if(event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2
                     && (event.getTarget() instanceof LabeledText)) {
-                // TODO make normal double click handling
-                createVideoSettingsWindow(lvVideoSources.getSelectionModel().getSelectedIndex(), resources);
+                VideoSourceSettings settings = Serializer.getInstance().deserializeVideoSourceSettings(
+                        lvVideoSources.getSelectionModel().getSelectedIndex()
+                );
+                playVideo(settings.getType(), settings.getUrl());
             }
         });
 
@@ -145,36 +166,39 @@ public class FaceRecognition extends Application implements Initializable {
         cbVideoSourceType.getSelectionModel().selectFirst();
 
         btLoad.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-//            notificationPane.setText("Do you want to save your password?");
-//            notificationPane.setShowFromTop(true);
-//            notificationPane.show();
-
-            if (rxVideoSource != null) {
-                rxVideoSource.onComplete();
-            }
-
-            if (cbVideoSourceType.getSelectionModel().getSelectedIndex() == 0) {
-                videoSource = new CameraVideoSource(0);
-            } else if (cbVideoSourceType.getSelectionModel().getSelectedIndex() == 1) {
-                videoSource = new HttpVideoSource(tfURL.getText());
-            } else {
-                throw new IllegalStateException("Unknown item");
-            }
-
-            if (!videoSource.isOpened()) {
-                Notifications.create()
-                        .title("Ошибка")
-                        .text("Не возможно открыть источник видео")
-                        .showError();
-
-                return;
-            }
-
-            rxVideoSource = new RxVideoSource2(videoSource);
-            initVideoSource(rxVideoSource);
-            rxClassifier = ConsoleUtil.createClassifier();
-            showInImageView(rxVideoSource, videoSource, rxClassifier);
+            SourceTypes type = cbVideoSourceType.getSelectionModel().getSelectedIndex() == 0 ? CAMERA : PATH_OR_URL;
+            playVideo(type, tfURL.getText());
         });
+    }
+
+    private void playVideo(SourceTypes type, String url) {
+
+
+        if (rxVideoSource != null) {
+            rxVideoSource.onComplete();
+        }
+
+        if (type == CAMERA) {
+            videoSource = new CameraVideoSource(0);
+        } else if (type == PATH_OR_URL) {
+            videoSource = new HttpVideoSource(url);
+        } else {
+            throw new IllegalStateException("Unknown item");
+        }
+
+        if (!videoSource.isOpened()) {
+            Notifications.create()
+                    .title("Ошибка")
+                    .text("Не возможно открыть источник видео")
+                    .showError();
+
+            return;
+        }
+
+        rxVideoSource = new RxVideoSource2(videoSource);
+        initVideoSource(rxVideoSource);
+        rxClassifier = ConsoleUtil.createClassifier();
+        showInImageView(rxVideoSource, videoSource, rxClassifier);
     }
 
     private void showInImageView(RxVideoSource2 rxVideoSource, VideoSourceInterface videoSource, RxClassifier classifier) {
@@ -218,7 +242,7 @@ public class FaceRecognition extends Application implements Initializable {
             Platform.runLater(() -> {
                 imageView.setFitWidth(notResWidth * scale);
                 imageView.setFitHeight(notResHeight * scale);
-                stage.sizeToScene();
+                //stage.sizeToScene();
             });
         }));
 

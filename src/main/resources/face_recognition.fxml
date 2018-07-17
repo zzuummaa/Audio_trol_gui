@@ -6,6 +6,7 @@
 <?import javafx.scene.Group?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.ContextMenu?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Menu?>
@@ -51,12 +52,19 @@
     <center>
         <HBox>
             <VBox fx:id="vbLeftDropMenu" prefHeight="-Infinity" prefWidth="250">
-                <padding><Insets bottom="12" left="12" right="12" top="12" /></padding>
                 <Button fx:id="btAddVideo" text="Добавить">
                <VBox.margin>
-                  <Insets bottom="12.0" />
+                  <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
                </VBox.margin></Button>
-                <ListView fx:id="lvVideoSources" prefWidth="-Infinity" stylesheets="@list_view_style.css"/>
+                <ListView fx:id="lvVideoSources" prefWidth="-Infinity" stylesheets="@list_view_style.css">
+               <contextMenu>
+                  <ContextMenu>
+                    <items>
+                        <MenuItem fx:id="cmVideoSourcesChange" text="Изменить"/>
+                        <MenuItem fx:id="cmVideoSourcesDelete" text="Удалить"/>
+                    </items>
+                  </ContextMenu>
+               </contextMenu></ListView>
             <HBox.margin>
                <Insets />
             </HBox.margin>
@@ -111,7 +119,7 @@
     <bottom>
         <VBox>
             <Separator prefWidth="-Infinity" />
-            <ToolBar prefWidth="-Infinity" prefHeight="16">
+            <ToolBar prefHeight="16" prefWidth="-Infinity">
             </ToolBar>
         </VBox>
     </bottom>
