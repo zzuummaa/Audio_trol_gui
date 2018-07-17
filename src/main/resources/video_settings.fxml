@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="VideoSettings">
+<BorderPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="VideoSettingsController">
     <padding><Insets bottom="4" left="12" right="4" top="12" /></padding>
 
     <center>
@@ -72,7 +72,7 @@
             <HBox.margin>
                <Insets right="16.0" />
             </HBox.margin></Button>
-            <Button fx:id="btAccept" prefWidth="70.0" text="Принять">
+            <Button fx:id="btApply" prefWidth="70.0" text="Применить">
             <HBox.margin>
                <Insets />
             </HBox.margin></Button>

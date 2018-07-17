@@ -52,7 +52,7 @@
         <HBox>
             <VBox fx:id="vbLeftDropMenu" prefHeight="-Infinity" prefWidth="250">
                 <padding><Insets bottom="12" left="12" right="12" top="12" /></padding>
-                <Button text="Добавить">
+                <Button fx:id="btAddVideo" text="Добавить">
                <VBox.margin>
                   <Insets bottom="12.0" />
                </VBox.margin></Button>

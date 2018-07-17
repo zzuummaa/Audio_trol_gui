@@ -1,3 +1,5 @@
+import com.sun.javafx.scene.control.skin.LabeledText;
+import com.sun.javafx.scene.control.skin.ListViewSkin;
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 import javafx.application.Application;
@@ -5,21 +7,24 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.geometry.Side;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Pair;
-import org.controlsfx.control.HiddenSidesPane;
 import org.controlsfx.control.NotificationPane;
 import org.controlsfx.control.Notifications;
 import ru.zuma.rx.RxClassifier;
@@ -31,7 +36,6 @@ import ru.zuma.video.CameraVideoSource;
 import ru.zuma.video.HttpVideoSource;
 import ru.zuma.video.VideoSourceInterface;
 import serialization.Serializer;
-import serialization.model.VideoSourceSettings;
 import serialization.model.VideoSourceSettingsList;
 
 import java.io.IOException;
@@ -39,7 +43,6 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
 
 import static org.bytedeco.javacpp.opencv_core.Mat;
 import static org.bytedeco.javacpp.opencv_core.RectVector;
@@ -50,6 +53,9 @@ public class FaceRecognition extends Application implements Initializable {
     private static volatile VideoSourceInterface videoSource;
     private static volatile RxVideoSource2 rxVideoSource;
     private static volatile FPSCounter fpsCounter;
+
+    @FXML
+    private Button btAddVideo;
 
     @FXML
     private ListView lvVideoSources;
@@ -89,19 +95,37 @@ public class FaceRecognition extends Application implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         fpsCounter = new FPSCounter();
-//        rxVideoSource = ConsoleUtil.createVideoSource(new String[0]);
-//        initVideoSource(rxVideoSource);
 
-//        WebView webView = new WebView();
-//        webView.setPrefSize(0, 0);
-//        notificationPane = new NotificationPane(webView);
-//        vbox.getChildren().add(0, notificationPane);
-
-        VideoSourceSettingsList sourceList = Serializer.getInstance().deserializeVideoSourceSettings();
-
+        VideoSourceSettingsList sourceList = Serializer.getInstance().deserializeVideoSourceSettingsList();
         videoSourceItems = FXCollections.observableArrayList ();
-        sourceList.getItems().forEach(settings -> {
-            videoSourceItems.add(settings.getName());
+        if (sourceList != null) {
+            sourceList.getItems().forEach(settings -> {
+                videoSourceItems.add(settings.getName());
+            });
+        }
+        lvVideoSources.setItems(videoSourceItems);
+        //lvVideoSources.setContextMenu(new VideoItemContextMenu(lvVideoSources));
+
+        lvVideoSources.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.DELETE) {
+                ObservableList nums = lvVideoSources.getSelectionModel().getSelectedIndices();
+                nums.forEach(i -> System.out.print(i + " "));
+                System.out.println();
+                Serializer.getInstance().deleteVideoSourceSettings(nums);
+                videoSourceItems.removeAll(lvVideoSources.getSelectionModel().getSelectedItems());
+            }
+        });
+
+        lvVideoSources.setOnMouseClicked(event -> {
+            if(event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2
+                    && (event.getTarget() instanceof LabeledText)) {
+                // TODO make normal double click handling
+                createVideoSettingsWindow(lvVideoSources.getSelectionModel().getSelectedIndex(), resources);
+            }
+        });
+
+        btAddVideo.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
+            createVideoSettingsWindow(null, resources);
         });
 
         btVideo.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
@@ -240,4 +264,29 @@ public class FaceRecognition extends Application implements Initializable {
         this.stage = stage;
     }
 
+    private void createVideoSettingsWindow(Integer storageIdx, ResourceBundle resources) {
+        Parent root;
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("video_settings.fxml"), resources);
+            root = loader.load();
+            VideoSettingsController controller = loader.getController();
+            Stage newWindow = new Stage();
+            controller.setStage(newWindow);
+            controller.setStorageIdx(storageIdx);
+            controller.setOnOK(vss -> {
+                lvVideoSources.getItems().add(vss.getName());
+            });
+
+            newWindow.setTitle("My New Stage Title");
+            newWindow.setScene(new Scene(root));
+            newWindow.initModality(Modality.WINDOW_MODAL);
+            newWindow.initOwner(stage);
+            newWindow.show();
+            // Hide this current window (if this is what you want)
+            //((Node)(event.getSource())).getScene().getWindow().setFocused();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

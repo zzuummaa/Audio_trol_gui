@@ -8,6 +8,12 @@ import serialization.model.VideoSourceSettingsList;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 public class Serializer {
     private static Serializer ourInstance = new Serializer();
@@ -16,7 +22,8 @@ public class Serializer {
         return ourInstance;
     }
 
-    private final static String PATH = "storage/";
+    private static final String VIDEO_SOURCE_SETTINGS_FILE_NAME = "video_source_settings.xml";
+    private static final String PATH = "storage/";
 
     private XmlMapper mapper;
 
@@ -24,32 +31,42 @@ public class Serializer {
         mapper = new XmlMapper();
         mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
         mapper.configure(ToXmlGenerator.Feature.WRITE_XML_1_1, true);
+
+        Path path = Paths.get(PATH + VIDEO_SOURCE_SETTINGS_FILE_NAME);
+        if (!Files.exists(path)) {
+            try {
+                Files.createFile(path);
+                serialize(new VideoSourceSettingsList(new ArrayList<>()));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public synchronized boolean serialize(VideoSourceSettingsList settings) {
         try {
-            mapper.writeValue(new File(PATH + "video_source_settings.xml"), settings);
+            mapper.writeValue(new File(PATH + VIDEO_SOURCE_SETTINGS_FILE_NAME), settings);
             return true;
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println(e.getMessage());
             return false;
         }
     }
 
-    public synchronized boolean add(VideoSourceSettings settings) {
-        VideoSourceSettingsList settingsList = deserializeVideoSourceSettings();
+    public synchronized Integer add(VideoSourceSettings settings) {
+        VideoSourceSettingsList settingsList = deserializeVideoSourceSettingsList();
         if (settingsList == null) {
-            return false;
+            settingsList = new VideoSourceSettingsList(new ArrayList<>());
         }
 
         settingsList.getItems().add(settings);
-        return serialize(settingsList);
+        return serialize(settingsList) ? settingsList.getItems().size() - 1 : null;
     }
 
     public synchronized boolean update(int i, VideoSourceSettings settings) {
-        VideoSourceSettingsList settingsList = deserializeVideoSourceSettings();
+        VideoSourceSettingsList settingsList = deserializeVideoSourceSettingsList();
         if (settingsList == null) {
-            return false;
+            settingsList = new VideoSourceSettingsList();
         }
 
         settingsList.getItems().remove(i);
@@ -57,12 +74,44 @@ public class Serializer {
         return serialize(settingsList);
     }
 
-    public synchronized VideoSourceSettingsList deserializeVideoSourceSettings() {
+    public synchronized VideoSourceSettingsList deserializeVideoSourceSettingsList() {
         try {
-            return mapper.readValue(new File(PATH + "video_source_settings.xml"), VideoSourceSettingsList.class);
+            return mapper.readValue(new File(PATH + VIDEO_SOURCE_SETTINGS_FILE_NAME), VideoSourceSettingsList.class);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println(e.getMessage());
             return null;
         }
+    }
+
+    public synchronized VideoSourceSettings deserializeVideoSourceSettings(int i) {
+        VideoSourceSettingsList settingsList = deserializeVideoSourceSettingsList();
+        if (settingsList != null) {
+            return settingsList.getItems().get(i);
+        } else {
+            return null;
+        }
+    }
+
+    public synchronized boolean deleteVideoSourceSettings(List<Integer> idxs) {
+        VideoSourceSettingsList settingsList = deserializeVideoSourceSettingsList();
+        if (settingsList == null) {
+            return false;
+        }
+
+        List removing = new ArrayList();
+        idxs.forEach( i -> removing.add(settingsList.getItems().get(i)));
+        settingsList.getItems().removeAll(removing);
+
+        return serialize(settingsList);
+    }
+
+    public synchronized boolean deleteVideoSourceSettings(int i) {
+        VideoSourceSettingsList settingsList = deserializeVideoSourceSettingsList();
+        if (settingsList == null) {
+            return false;
+        }
+
+        settingsList.getItems().remove(i);
+        return serialize(settingsList);
     }
 }

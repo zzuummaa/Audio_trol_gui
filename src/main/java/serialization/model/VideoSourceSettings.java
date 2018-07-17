@@ -3,8 +3,8 @@ package serialization.model;
 public class VideoSourceSettings {
 
     public enum SourceTypes {
-        camera,
-        pathOrURl
+        CAMERA,
+        PATH_OR_URL
     }
 
     private String name;
