@@ -6,6 +6,7 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
@@ -18,48 +19,62 @@
     <padding><Insets bottom="4" left="12" right="4" top="12" /></padding>
 
     <center>
-        <HBox>
-            <VBox>
-                <GridPane>
-                    <Label alignment="CENTER" text="Название:" GridPane.columnIndex="0" GridPane.rowIndex="0">
-                        <GridPane.margin><Insets bottom="8" right="16" /></GridPane.margin>
-                    </Label>
-                    <TextField fx:id="tfName" prefWidth="360" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                        <GridPane.margin><Insets bottom="8" right="16" /></GridPane.margin>
-                    </TextField>
-                    <Label alignment="CENTER" text="Источник видео:" GridPane.columnIndex="0" GridPane.rowIndex="1">
-                        <GridPane.margin><Insets bottom="8" right="16" /></GridPane.margin>
-                    </Label>
-                    <ComboBox fx:id="cbVideoSourceType" prefWidth="360" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                        <GridPane.margin><Insets bottom="8" right="16" /></GridPane.margin>
-                        <items>
-                            <FXCollections fx:id="videoSourceTypes" fx:factory="observableArrayList">
-                                <String fx:value="Камера" />
-                                <String fx:value="Файл или URL" />
-                            </FXCollections>
-                        </items>
-                    </ComboBox>
-                    <Label alignment="CENTER" text="Путь или URL:" GridPane.columnIndex="0" GridPane.rowIndex="2">
-                        <GridPane.margin><Insets bottom="8" right="16" /></GridPane.margin>
-                    </Label>
-                    <TextField fx:id="tfURL" prefWidth="360" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                        <GridPane.margin><Insets bottom="8" right="16" /></GridPane.margin>
-                    </TextField>
-                    <Button fx:id="btTest" text="Тест" GridPane.columnIndex="2" GridPane.rowIndex="2">
-                        <GridPane.margin><Insets bottom="8" right="16" /></GridPane.margin>
-                    </Button>
-                    <columnConstraints>
-                        <ColumnConstraints />
-                        <ColumnConstraints />
-                        <ColumnConstraints />
-                    </columnConstraints>
-                    <rowConstraints>
-                        <RowConstraints />
-                        <RowConstraints />
-                    </rowConstraints>
-                </GridPane>
-            </VBox>
-        </HBox>
+        <VBox>
+            <GridPane>
+                <Label alignment="CENTER" text="Название:" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                    <GridPane.margin><Insets bottom="8" right="16" /></GridPane.margin>
+                </Label>
+                <TextField fx:id="tfName" prefWidth="360" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                    <GridPane.margin><Insets bottom="8" right="16" /></GridPane.margin>
+                </TextField>
+                <Label alignment="CENTER" text="Источник видео:" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                    <GridPane.margin><Insets bottom="8" right="16" /></GridPane.margin>
+                </Label>
+                <ComboBox fx:id="cbVideoSourceType" prefWidth="360" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                    <GridPane.margin><Insets bottom="8" right="16" /></GridPane.margin>
+                    <items>
+                        <FXCollections fx:id="videoSourceTypes" fx:factory="observableArrayList">
+                            <String fx:value="Камера" />
+                            <String fx:value="Файл или URL" />
+                        </FXCollections>
+                    </items>
+                </ComboBox>
+                <Label alignment="CENTER" text="Путь или URL:" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                    <GridPane.margin><Insets bottom="8" right="16" /></GridPane.margin>
+                </Label>
+                <TextField fx:id="tfURL" prefWidth="360" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                    <GridPane.margin><Insets bottom="8" right="16" /></GridPane.margin>
+                </TextField>
+                <Button fx:id="btTest" text="Тест" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                    <GridPane.margin><Insets bottom="8" right="16" /></GridPane.margin>
+                </Button>
+                <columnConstraints>
+                    <ColumnConstraints />
+                    <ColumnConstraints />
+                    <ColumnConstraints />
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints />
+                    <RowConstraints />
+               <RowConstraints />
+                </rowConstraints>
+            </GridPane>
+
+            <HBox alignment="CENTER_LEFT">
+                <padding><Insets bottom="8"/></padding>
+                <Label text="Дополнительно"><padding><Insets right="12"/></padding></Label>
+                <Separator prefWidth="435.0" />
+            </HBox>
+
+            <GridPane>
+                <Label alignment="CENTER" text="Таймаут, мс (не работает):" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                    <GridPane.margin><Insets bottom="8" right="16" /></GridPane.margin>
+                </Label>
+                <TextField fx:id="tfTimeout" prefWidth="360" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                    <GridPane.margin><Insets bottom="8" right="16" /></GridPane.margin>
+                </TextField>
+            </GridPane>
+        </VBox>
     </center>
 
     <bottom>

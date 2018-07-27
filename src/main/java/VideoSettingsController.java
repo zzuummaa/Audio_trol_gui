@@ -1,3 +1,4 @@
+import com.sun.deploy.util.StringUtils;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -25,6 +26,7 @@ public class VideoSettingsController implements Initializable {
     public Button btOk;
     public Button btCancel;
     public Button btApply;
+    public TextField tfTimeout;
 
     private Stage stage;
 
@@ -50,8 +52,10 @@ public class VideoSettingsController implements Initializable {
         cbVideoSourceType.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue.intValue() == 0) {
                 tfURL.setDisable(true);
+                tfTimeout.setDisable(true);
             } else if (newValue.intValue() == 1) {
                 tfURL.setDisable(false);
+                tfTimeout.setDisable(false);
             }
         });
         cbVideoSourceType.getSelectionModel().selectFirst();
@@ -80,6 +84,7 @@ public class VideoSettingsController implements Initializable {
             VideoSourceSettings settings = Serializer.getInstance().deserializeVideoSourceSettings(storageIdx);
             tfName.setText(settings.getName());
             tfURL.setText(settings.getUrl());
+            tfTimeout.setText(settings.getTimeout());
 
             switch (settings.getType()) {
                 case CAMERA: cbVideoSourceType.getSelectionModel().select(0); break;
@@ -92,6 +97,7 @@ public class VideoSettingsController implements Initializable {
         VideoSourceSettings settings = new VideoSourceSettings();
         settings.setName(tfName.getText());
         settings.setUrl(tfURL.getText());
+        settings.setTimeout(tfTimeout.getText());
 
         switch (cbVideoSourceType.getSelectionModel().getSelectedIndex()) {
             case 0: settings.setType(CAMERA); break;

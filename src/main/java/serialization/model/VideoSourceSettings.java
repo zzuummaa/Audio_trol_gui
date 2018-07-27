@@ -1,5 +1,7 @@
 package serialization.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class VideoSourceSettings {
 
     public enum SourceTypes {
@@ -10,14 +12,16 @@ public class VideoSourceSettings {
     private String name;
     private SourceTypes type;
     private String url;
+    private String timeout;
 
     public VideoSourceSettings() {
     }
 
-    public VideoSourceSettings(String name, SourceTypes type, String url) {
+    public VideoSourceSettings(String name, SourceTypes type, String url, String timeout) {
         this.name = name;
         this.type = type;
         this.url = url;
+        this.timeout = timeout;
     }
 
     public String getName() {
@@ -44,12 +48,30 @@ public class VideoSourceSettings {
         this.url = url;
     }
 
+    public String getTimeout() {
+        return timeout;
+    }
+
+    public void setTimeout(String timeout) {
+        this.timeout = timeout;
+    }
+
+    @JsonIgnore
+    public Integer getTimeoutAsInt() {
+        try {
+            return timeout == null ? null : Integer.parseUnsignedInt(timeout.trim());
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
     @Override
     public String toString() {
         return "VideoSourceSettings{" +
                 "name='" + name + '\'' +
                 ", type=" + type +
                 ", url='" + url + '\'' +
+                ", timeout=" + timeout +
                 '}';
     }
 }

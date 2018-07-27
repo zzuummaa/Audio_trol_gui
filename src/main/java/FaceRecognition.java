@@ -96,6 +96,8 @@ public class FaceRecognition extends Application implements Initializable {
     @FXML
     private ImageView imageView;
 
+    private int defaultSourceTimeout = 10_000;
+
     private static Stage stage;
     private NotificationPane notificationPane;
 
@@ -143,7 +145,7 @@ public class FaceRecognition extends Application implements Initializable {
                 VideoSourceSettings settings = Serializer.getInstance().deserializeVideoSourceSettings(
                         lvVideoSources.getSelectionModel().getSelectedIndex()
                 );
-                playVideo(settings.getType(), settings.getUrl());
+                playVideo(settings.getType(), settings.getUrl(), settings.getTimeoutAsInt());
             }
         });
 
@@ -169,23 +171,22 @@ public class FaceRecognition extends Application implements Initializable {
 
         btLoad.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             SourceTypes type = cbVideoSourceType.getSelectionModel().getSelectedIndex() == 0 ? CAMERA : PATH_OR_URL;
-            playVideo(type, tfURL.getText());
+            playVideo(type, tfURL.getText(), defaultSourceTimeout);
         });
     }
 
-    private void playVideo(SourceTypes type, String url) {
+    private void playVideo(SourceTypes type, String url, Integer timeout) {
         executor.execute(() -> {
             if (rxVideoSource != null) {
                 Platform.runLater(() -> lbVideoPlayingStatus.setText("Остановка старого видеопотока..."));
                 rxVideoSource.onComplete();
             }
 
-
             Platform.runLater(() -> lbVideoPlayingStatus.setText("Ожидание видеопотока..."));
             if (type == CAMERA) {
                 videoSource = new CameraVideoSource(0);
             } else if (type == PATH_OR_URL) {
-                videoSource = new HttpVideoSource(url);
+                videoSource = new HttpVideoSource(url, timeout == null ? defaultSourceTimeout : timeout);
             } else {
                 throw new IllegalStateException("Unknown item");
             }
