@@ -51,10 +51,14 @@ import static serialization.model.VideoSourceSettings.SourceTypes.PATH_OR_URL;
 
 public class FaceRecognition extends Application implements Initializable {
 
+    private static Stage stage;
+
     private static volatile RxClassifier rxClassifier;
-    private static volatile VideoSourceInterface videoSource;
     private static volatile RxVideoSource2 rxVideoSource;
     private static volatile FPSCounter fpsCounter;
+
+    private static volatile ExecutorService executor = Executors.newCachedThreadPool();
+    private static volatile Future future;
 
     @FXML
     private Label lbVideoPlayingStatus;
@@ -97,11 +101,7 @@ public class FaceRecognition extends Application implements Initializable {
     private ImageView imageView;
 
     private int defaultSourceTimeout = 10_000;
-
-    private static Stage stage;
     private NotificationPane notificationPane;
-
-    private static volatile ExecutorService executor = Executors.newSingleThreadExecutor();
 
     public static void main(String[] args) {
         launch(args);
@@ -176,12 +176,17 @@ public class FaceRecognition extends Application implements Initializable {
     }
 
     private void playVideo(SourceTypes type, String url, Integer timeout) {
-        executor.execute(() -> {
-            if (rxVideoSource != null) {
-                Platform.runLater(() -> lbVideoPlayingStatus.setText("Остановка старого видеопотока..."));
-                rxVideoSource.onComplete();
+        if (future != null) future.cancel(true);
+        future = executor.submit(() -> {
+            synchronized (RxVideoSource2.class) {
+                if (rxVideoSource != null) {
+                    Platform.runLater(() -> lbVideoPlayingStatus.setText("Остановка старого видеопотока..."));
+                    rxVideoSource.onComplete();
+                    rxVideoSource = null;
+                }
             }
 
+            VideoSourceInterface videoSource;
             Platform.runLater(() -> lbVideoPlayingStatus.setText("Ожидание видеопотока..."));
             if (type == CAMERA) {
                 videoSource = new CameraVideoSource(0);
@@ -189,6 +194,11 @@ public class FaceRecognition extends Application implements Initializable {
                 videoSource = new HttpVideoSource(url, timeout == null ? defaultSourceTimeout : timeout);
             } else {
                 throw new IllegalStateException("Unknown item");
+            }
+
+            if (Thread.interrupted()) {
+                videoSource.close();
+                return;
             }
 
             if (!videoSource.isOpened()) {
@@ -202,11 +212,14 @@ public class FaceRecognition extends Application implements Initializable {
             }
 
             Platform.runLater(() -> lbVideoPlayingStatus.setText("Инициализация модели обработки..."));
-            rxVideoSource = new RxVideoSource2(videoSource);
-            initVideoSource(rxVideoSource);
-            rxClassifier = ConsoleUtil.createClassifier();
-            showInImageView(rxVideoSource, videoSource, rxClassifier);
-            Platform.runLater(() -> lbVideoPlayingStatus.setText("Видео проигрывается"));
+
+            synchronized (RxVideoSource2.class) {
+                rxVideoSource = new RxVideoSource2(videoSource);
+                initVideoSource(rxVideoSource);
+                rxClassifier = ConsoleUtil.createClassifier();
+                showInImageView(rxVideoSource, videoSource, rxClassifier);
+                Platform.runLater(() -> lbVideoPlayingStatus.setText("Видео проигрывается"));
+            }
         });
     }
 
@@ -302,7 +315,7 @@ public class FaceRecognition extends Application implements Initializable {
         stage.setTitle("Audio Troll GUI");
         stage.setScene(scene);
         stage.show();
-        this.stage = stage;
+        FaceRecognition.stage = stage;
     }
 
     private void createVideoSettingsWindow(Integer storageIdx, ResourceBundle resources, boolean isUpdateLV) {
