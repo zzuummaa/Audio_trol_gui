@@ -21,7 +21,9 @@ public class AppSettingsController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         AppSettings settings = Serializer.getInstance().deserializeAppSettings();
-        tfPlinkPath.setText(settings.getPlinkPath());
+        if (settings != null) {
+            tfPlinkPath.setText(settings.getPlinkPath());
+        }
 
         btCancel.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> stage.close());
         btApply.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> apply());

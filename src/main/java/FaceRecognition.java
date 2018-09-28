@@ -87,6 +87,7 @@ public class FaceRecognition extends Application implements Initializable {
     @FXML
     private ListView lvVideoSources;
     private ObservableList<String> videoSourceItems;
+    private VideoSourceSettingsList sourceList;
 
     @FXML
     private VBox vbLeftDropMenuVideo;
@@ -127,7 +128,7 @@ public class FaceRecognition extends Application implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         fpsCounter = new FPSCounter();
 
-        VideoSourceSettingsList sourceList = Serializer.getInstance().deserializeVideoSourceSettingsList();
+        sourceList = Serializer.getInstance().deserializeVideoSourceSettingsList();
         videoSourceItems = FXCollections.observableArrayList ();
         if (sourceList != null) {
             sourceList.getItems().forEach(settings -> {
@@ -136,9 +137,16 @@ public class FaceRecognition extends Application implements Initializable {
         }
         lvVideoSources.setItems(videoSourceItems);
 
-        lvVideoSources.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) ->
-                videoSourceSelectedItem = newValue.intValue()
-        );
+        lvVideoSources.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
+            videoSourceSelectedItem = newValue.intValue();
+            VideoSourceSettings settings = sourceList.getItems().get(newValue.intValue());
+            tfURL.setText(settings.getUrl());
+
+            switch (settings.getType()) {
+                case CAMERA: cbVideoSourceType.getSelectionModel().select(0); break;
+                case PATH_OR_URL: cbVideoSourceType.getSelectionModel().select(1); break;
+            }
+        });
 
         cmVideoSourcesDelete.setOnAction(event -> {
             if (videoSourceSelectedItem != -1) {
@@ -182,7 +190,8 @@ public class FaceRecognition extends Application implements Initializable {
         });
 
         btSSH.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
-            handleLeftDropMenuItemClick(btSSH);
+            // TODO refactor logic of left menu
+            //handleLeftDropMenuItemClick(btSSH);
         });
 
         cbVideoSourceType.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
@@ -199,9 +208,10 @@ public class FaceRecognition extends Application implements Initializable {
             playVideo(type, tfURL.getText(), defaultSourceTimeout);
         });
 
-        btExit.setOnAction(event ->
-            stage.getOnCloseRequest().handle(new WindowEvent(stage, WindowEvent.WINDOW_CLOSE_REQUEST))
-        );
+        btExit.setOnAction(event -> {
+            stage.getOnCloseRequest().handle(new WindowEvent(stage, WindowEvent.WINDOW_CLOSE_REQUEST));
+            stage.close();
+        });
 
         btSettings.setOnAction(event ->
             createAppSettingsWindow(resources)
@@ -394,6 +404,7 @@ public class FaceRecognition extends Application implements Initializable {
             if (isUpdateLV) {
                 controller.setOnNewVideoSettings(vss -> {
                     lvVideoSources.getItems().add(vss.getName());
+                    sourceList.getItems().add(vss);
                 });
             }
 

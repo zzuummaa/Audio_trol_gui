@@ -1,5 +1,6 @@
 package serialization;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
@@ -32,28 +33,26 @@ public class Serializer {
         mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
         mapper.configure(ToXmlGenerator.Feature.WRITE_XML_1_1, true);
 
-        Path path = Paths.get(PATH + VIDEO_SOURCE_SETTINGS_FILE_NAME);
+        checkFileExists(PATH + VIDEO_SOURCE_SETTINGS_FILE_NAME, new VideoSourceSettingsList(new ArrayList<>()));
+        checkFileExists(PATH + APP_SETTINGS_FILE_NAME, new AppSettings(""));
+    }
+
+    private void checkFileExists(String fileName, Object o) {
+        Path path = Paths.get(fileName);
+
         if (!Files.exists(path)) {
             try {
                 Files.createFile(path);
-                serialize(new VideoSourceSettingsList(new ArrayList<>()));
+                serialize(o, fileName);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    public synchronized boolean serialize(VideoSourceSettingsList settings) {
-        return serializeUnsafe(settings);
-    }
-
-    public synchronized boolean serialize(AppSettings appSettings) {
-        return serializeUnsafe(appSettings);
-    }
-
-    private boolean serializeUnsafe(Object o) {
+    private synchronized boolean serialize(Object o, String fileName) {
         try {
-            mapper.writeValue(new File(PATH + APP_SETTINGS_FILE_NAME), o);
+            mapper.writeValue(new File(fileName), o);
             return true;
         } catch (IOException e) {
             System.err.println(e.getMessage());
@@ -68,7 +67,7 @@ public class Serializer {
         }
 
         settingsList.getItems().add(settings);
-        return serialize(settingsList) ? settingsList.getItems().size() - 1 : null;
+        return serialize(settingsList, PATH + VIDEO_SOURCE_SETTINGS_FILE_NAME) ? settingsList.getItems().size() - 1 : null;
     }
 
     public synchronized boolean update(int i, VideoSourceSettings settings) {
@@ -79,7 +78,7 @@ public class Serializer {
 
         settingsList.getItems().remove(i);
         settingsList.getItems().add(i, settings);
-        return serialize(settingsList);
+        return serialize(settingsList, PATH + VIDEO_SOURCE_SETTINGS_FILE_NAME);
     }
 
     public synchronized VideoSourceSettingsList deserializeVideoSourceSettingsList() {
@@ -100,15 +99,6 @@ public class Serializer {
         }
     }
 
-    public synchronized AppSettings deserializeAppSettings() {
-        try {
-            return mapper.readValue(new File(PATH + APP_SETTINGS_FILE_NAME), AppSettings.class);
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
-            return null;
-        }
-    }
-
     public synchronized boolean deleteVideoSourceSettings(List<Integer> idxs) {
         VideoSourceSettingsList settingsList = deserializeVideoSourceSettingsList();
         if (settingsList == null) {
@@ -119,7 +109,7 @@ public class Serializer {
         idxs.forEach( i -> removing.add(settingsList.getItems().get(i)));
         settingsList.getItems().removeAll(removing);
 
-        return serialize(settingsList);
+        return serialize(settingsList, PATH + VIDEO_SOURCE_SETTINGS_FILE_NAME);
     }
 
     public synchronized boolean deleteVideoSourceSettings(int i) {
@@ -129,6 +119,23 @@ public class Serializer {
         }
 
         settingsList.getItems().remove(i);
-        return serialize(settingsList);
+        return serialize(settingsList, PATH + VIDEO_SOURCE_SETTINGS_FILE_NAME);
+    }
+
+    public AppSettings deserializeAppSettings() {
+        try {
+            return mapper.readValue(new File(PATH + APP_SETTINGS_FILE_NAME), AppSettings.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public boolean serialize(AppSettings appSettings) {
+        return serialize(appSettings, PATH + APP_SETTINGS_FILE_NAME);
+    }
+
+    public boolean serialize(VideoSourceSettingsList appSettings) {
+        return serialize(appSettings, PATH + VIDEO_SOURCE_SETTINGS_FILE_NAME);
     }
 }
