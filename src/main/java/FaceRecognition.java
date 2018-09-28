@@ -406,6 +406,13 @@ public class FaceRecognition extends Application implements Initializable {
                     lvVideoSources.getItems().add(vss.getName());
                     sourceList.getItems().add(vss);
                 });
+            } else {
+                controller.setOnNewVideoSettings(vss -> {
+                    sourceList.getItems().add(storageIdx, vss);
+                    if (sourceList.getItems().size() > storageIdx + 1) {
+                        sourceList.getItems().remove(storageIdx + 1);
+                    }
+                });
             }
 
             newWindow.setTitle("Конфигурация видеоисточника");

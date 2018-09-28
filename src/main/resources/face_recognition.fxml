@@ -27,7 +27,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="FaceRecognition">
+<BorderPane prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="FaceRecognition">
 
     <top>
         <MenuBar>
@@ -55,7 +55,7 @@
     </top>
 
     <center>
-        <SplitPane dividerPositions="0.35">
+        <SplitPane dividerPositions="0.25">
             <items>
                 <!--<ScrollPane>-->
                     <!--<content>-->
