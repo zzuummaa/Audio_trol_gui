@@ -373,7 +373,6 @@ public class FaceRecognition extends Application implements Initializable {
             }
 
             System.out.println("Goodbye!");
-            System.exit(0);
         });
 
         Scene scene = new Scene(root);
