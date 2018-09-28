@@ -3,6 +3,7 @@ package serialization;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
+import serialization.model.AppSettings;
 import serialization.model.VideoSourceSettings;
 import serialization.model.VideoSourceSettingsList;
 
@@ -15,14 +16,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Serializer {
+    private static final String VIDEO_SOURCE_SETTINGS_FILE_NAME = "video_source_settings.xml";
+    private static final String APP_SETTINGS_FILE_NAME = "app_settings.xml";
+    private static final String PATH = "storage/";
     private static Serializer ourInstance = new Serializer();
 
     public static Serializer getInstance() {
         return ourInstance;
     }
-
-    private static final String VIDEO_SOURCE_SETTINGS_FILE_NAME = "video_source_settings.xml";
-    private static final String PATH = "storage/";
 
     private XmlMapper mapper;
 
@@ -43,8 +44,16 @@ public class Serializer {
     }
 
     public synchronized boolean serialize(VideoSourceSettingsList settings) {
+        return serializeUnsafe(settings);
+    }
+
+    public synchronized boolean serialize(AppSettings appSettings) {
+        return serializeUnsafe(appSettings);
+    }
+
+    private boolean serializeUnsafe(Object o) {
         try {
-            mapper.writeValue(new File(PATH + VIDEO_SOURCE_SETTINGS_FILE_NAME), settings);
+            mapper.writeValue(new File(PATH + APP_SETTINGS_FILE_NAME), o);
             return true;
         } catch (IOException e) {
             System.err.println(e.getMessage());
@@ -87,6 +96,15 @@ public class Serializer {
         if (settingsList != null) {
             return settingsList.getItems().get(i);
         } else {
+            return null;
+        }
+    }
+
+    public synchronized AppSettings deserializeAppSettings() {
+        try {
+            return mapper.readValue(new File(PATH + APP_SETTINGS_FILE_NAME), AppSettings.class);
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
             return null;
         }
     }

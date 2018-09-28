@@ -6,7 +6,6 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -21,6 +20,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import javafx.util.Pair;
 import org.controlsfx.control.NotificationPane;
 import ru.zuma.rx.RxClassifier;
@@ -61,6 +61,18 @@ public class FaceRecognition extends Application implements Initializable {
     private static volatile Future future;
 
     @FXML
+    private Button btAddSSH;
+
+    @FXML
+    private VBox vbLeftDropMenuSSH;
+
+    @FXML
+    private MenuItem btSettings;
+
+    @FXML
+    private MenuItem btExit;
+
+    @FXML
     private Label lbVideoPlayingStatus;
 
     @FXML
@@ -77,13 +89,16 @@ public class FaceRecognition extends Application implements Initializable {
     private ObservableList<String> videoSourceItems;
 
     @FXML
-    private VBox vbLeftDropMenu;
+    private VBox vbLeftDropMenuVideo;
 
     @FXML
     private Separator spLeftDropMenu;
 
     @FXML
     private Button btVideo;
+
+    @FXML
+    private Button btSSH;
 
     @FXML
     private TextField tfURL;
@@ -102,6 +117,7 @@ public class FaceRecognition extends Application implements Initializable {
 
     private int defaultSourceTimeout = 10_000;
     private NotificationPane notificationPane;
+    private int videoSourceSelectedItem = -1;
 
     public static void main(String[] args) {
         launch(args);
@@ -120,15 +136,23 @@ public class FaceRecognition extends Application implements Initializable {
         }
         lvVideoSources.setItems(videoSourceItems);
 
+        lvVideoSources.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) ->
+                videoSourceSelectedItem = newValue.intValue()
+        );
+
         cmVideoSourcesDelete.setOnAction(event -> {
-            int num = lvVideoSources.getSelectionModel().getSelectedIndex();
-            Serializer.getInstance().deleteVideoSourceSettings(num);
-            videoSourceItems.remove(num);
+            if (videoSourceSelectedItem != -1) {
+                Serializer.getInstance().deleteVideoSourceSettings(videoSourceSelectedItem);
+                videoSourceItems.remove(videoSourceSelectedItem);
+            }
+
         });
 
         cmVideoSourcesChange.setOnAction(event -> {
             // TODO make normal double click handling
-            createVideoSettingsWindow(lvVideoSources.getSelectionModel().getSelectedIndex(), resources, false);
+            if (videoSourceSelectedItem != -1) {
+                createVideoSettingsWindow(videoSourceSelectedItem, resources, false);
+            }
         });
 
         lvVideoSources.setOnKeyPressed(event -> {
@@ -154,10 +178,11 @@ public class FaceRecognition extends Application implements Initializable {
         });
 
         btVideo.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
-            vbLeftDropMenu.setManaged(!vbLeftDropMenu.isManaged());
-            vbLeftDropMenu.setVisible(!vbLeftDropMenu.isVisible());
-            spLeftDropMenu.setVisible(!spLeftDropMenu.isVisible());
-            stage.sizeToScene();
+            handleLeftDropMenuItemClick(btVideo);
+        });
+
+        btSSH.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
+            handleLeftDropMenuItemClick(btSSH);
         });
 
         cbVideoSourceType.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
@@ -173,6 +198,14 @@ public class FaceRecognition extends Application implements Initializable {
             SourceTypes type = cbVideoSourceType.getSelectionModel().getSelectedIndex() == 0 ? CAMERA : PATH_OR_URL;
             playVideo(type, tfURL.getText(), defaultSourceTimeout);
         });
+
+        btExit.setOnAction(event ->
+            stage.getOnCloseRequest().handle(new WindowEvent(stage, WindowEvent.WINDOW_CLOSE_REQUEST))
+        );
+
+        btSettings.setOnAction(event ->
+            createAppSettingsWindow(resources)
+        );
     }
 
     private void playVideo(SourceTypes type, String url, Integer timeout) {
@@ -221,6 +254,38 @@ public class FaceRecognition extends Application implements Initializable {
                 Platform.runLater(() -> lbVideoPlayingStatus.setText("Видео проигрывается"));
             }
         });
+    }
+
+    private void handleLeftDropMenuItemClick(Button bt) {
+        if (bt == btVideo) {
+            if (vbLeftDropMenuVideo.isVisible()) {
+                vbLeftDropMenuVideo.setManaged(false);
+                vbLeftDropMenuVideo.setVisible(false);
+                spLeftDropMenu.setVisible(false);
+            } else {
+                vbLeftDropMenuVideo.setManaged(true);
+                vbLeftDropMenuVideo.setVisible(true);
+                spLeftDropMenu.setVisible(true);
+
+                vbLeftDropMenuSSH.setManaged(false);
+                vbLeftDropMenuSSH.setVisible(false);
+            }
+//            stage.sizeToScene();
+        }
+        if (bt == btSSH) {
+            if (vbLeftDropMenuSSH.isVisible()) {
+                vbLeftDropMenuSSH.setManaged(false);
+                vbLeftDropMenuSSH.setVisible(false);
+                spLeftDropMenu.setVisible(false);
+            } else {
+                vbLeftDropMenuSSH.setManaged(true);
+                vbLeftDropMenuSSH.setVisible(true);
+                spLeftDropMenu.setVisible(true);
+
+                vbLeftDropMenuVideo.setManaged(false);
+                vbLeftDropMenuVideo.setVisible(false);
+            }
+        }
     }
 
     private void showInImageView(RxVideoSource2 rxVideoSource, VideoSourceInterface videoSource, RxClassifier classifier) {
@@ -333,7 +398,29 @@ public class FaceRecognition extends Application implements Initializable {
                 });
             }
 
-            newWindow.setTitle("My New Stage Title");
+            newWindow.setTitle("Конфигурация видеоисточника");
+            newWindow.setScene(new Scene(root));
+            newWindow.initModality(Modality.WINDOW_MODAL);
+            newWindow.initOwner(stage);
+            newWindow.show();
+            // Hide this current window (if this is what you want)
+            //((Node)(event.getSource())).getScene().getWindow().setFocused();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void createAppSettingsWindow(ResourceBundle resources) {
+        Parent root;
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("app_settings.fxml"), resources);
+            root = loader.load();
+            AppSettingsController controller = loader.getController();
+            Stage newWindow = new Stage();
+            controller.setStage(newWindow);
+
+            newWindow.setTitle("Настроки");
             newWindow.setScene(new Scene(root));
             newWindow.initModality(Modality.WINDOW_MODAL);
             newWindow.initOwner(stage);

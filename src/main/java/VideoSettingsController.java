@@ -1,4 +1,3 @@
-import com.sun.deploy.util.StringUtils;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -61,7 +60,7 @@ public class VideoSettingsController implements Initializable {
         cbVideoSourceType.getSelectionModel().selectFirst();
     }
 
-    public void setOnNewVideoSettings(Consumer<VideoSourceSettings> onNewVideoSettings) {
+    void setOnNewVideoSettings(Consumer<VideoSourceSettings> onNewVideoSettings) {
         this.onNewVideoSettings = onNewVideoSettings;
     }
 
@@ -78,7 +77,7 @@ public class VideoSettingsController implements Initializable {
         });
     }
 
-    public void setStorageIdx(Integer storageIdx) {
+    void setStorageIdx(Integer storageIdx) {
         this.storageIdx = storageIdx;
         if (storageIdx != null) {
             VideoSourceSettings settings = Serializer.getInstance().deserializeVideoSourceSettings(storageIdx);
@@ -93,7 +92,7 @@ public class VideoSettingsController implements Initializable {
         }
     }
 
-    public VideoSourceSettings apply() {
+    private VideoSourceSettings apply() {
         VideoSourceSettings settings = new VideoSourceSettings();
         settings.setName(tfName.getText());
         settings.setUrl(tfURL.getText());

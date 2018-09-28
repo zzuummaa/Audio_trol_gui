@@ -21,28 +21,32 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
 <BorderPane xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="FaceRecognition">
 
     <top>
         <MenuBar>
             <menus>
-                <Menu text="File">
+                <Menu text="Файл">
                     <items>
-                        <MenuItem text="Exit" />
+                        <MenuItem fx:id="btSettings" text="Настроки" />
+                        <MenuItem fx:id="btExit" text="Выход" />
                     </items>
                 </Menu>
-                <Menu text="Edit">
+                <Menu text="Изменить">
                     <items>
-                        <MenuItem text="Copy" />
-                        <MenuItem text="Cut" />
-                        <MenuItem text="Paste" />
+                        <MenuItem text="Скопировать" />
+                        <MenuItem text="Вырезать" />
+                        <MenuItem text="Вставить" />
                     </items>
                 </Menu>
-                <Menu text="Help">
+                <Menu text="Помощь">
                     <items>
-                        <MenuItem text="About" />
+                        <MenuItem text="О приложении" />
                     </items>
                 </Menu>
             </menus>
@@ -51,23 +55,47 @@
 
     <center>
         <HBox>
-            <VBox fx:id="vbLeftDropMenu" prefHeight="-Infinity" prefWidth="250">
-                <Button fx:id="btAddVideo" text="Добавить">
-               <VBox.margin>
-                  <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
-               </VBox.margin></Button>
+            <VBox fx:id="vbLeftDropMenuVideo" prefHeight="-Infinity" prefWidth="250">
+                <AnchorPane>
+                    <VBox.margin>
+                        <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
+                    </VBox.margin>
+                    <Label text="Источники видео" textAlignment="CENTER" AnchorPane.leftAnchor="0">
+                        <font>
+                            <Font size="16.0"/>
+                        </font>
+                    </Label>
+                    <Button fx:id="btAddVideo" AnchorPane.rightAnchor="0" text="Добавить"/>
+                </AnchorPane>
                 <ListView fx:id="lvVideoSources" prefWidth="-Infinity" stylesheets="@list_view_style.css">
-               <contextMenu>
-                  <ContextMenu>
-                    <items>
-                        <MenuItem fx:id="cmVideoSourcesChange" text="Изменить"/>
-                        <MenuItem fx:id="cmVideoSourcesDelete" text="Удалить"/>
-                    </items>
-                  </ContextMenu>
-               </contextMenu></ListView>
-            <HBox.margin>
-               <Insets />
-            </HBox.margin>
+                    <contextMenu>
+                    <ContextMenu>
+                        <items>
+                            <MenuItem fx:id="cmVideoSourcesChange" text="Изменить" />
+                            <MenuItem fx:id="cmVideoSourcesDelete" text="Удалить" />
+                        </items>
+                    </ContextMenu>
+                    </contextMenu>
+                </ListView>
+                <HBox.margin>
+                   <Insets />
+                </HBox.margin>
+            </VBox>
+            <VBox fx:id="vbLeftDropMenuSSH" managed="false" prefHeight="-Infinity" prefWidth="250" visible="false">
+                <AnchorPane>
+                    <VBox.margin>
+                        <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
+                    </VBox.margin>
+                    <Label text="Конфигурации SSH" AnchorPane.leftAnchor="0">
+                        <font>
+                            <Font size="16.0"/>
+                        </font>
+                    </Label>
+                    <Button fx:id="btAddSSH" AnchorPane.rightAnchor="0" text="Добавить"/>
+                </AnchorPane>
+                <HBox.margin>
+                    <Insets />
+                </HBox.margin>
             </VBox>
             <Separator fx:id="spLeftDropMenu" orientation="VERTICAL" />
             <VBox fx:id="vbox">
@@ -101,6 +129,7 @@
                     <rowConstraints>
                         <RowConstraints />
                         <RowConstraints />
+                  <RowConstraints />
                     </rowConstraints>
 
                 </GridPane>
@@ -113,6 +142,7 @@
         <HBox>
             <ToolBar orientation="VERTICAL">
                 <Group><Button fx:id="btVideo" rotate="-90.0" text="Видео" /></Group>
+                <Group><Button fx:id="btSSH" rotate="-90.0" text="SSH" /></Group>
             </ToolBar>
             <Separator orientation="VERTICAL" />
         </HBox>
