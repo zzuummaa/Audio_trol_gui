@@ -139,6 +139,7 @@ public class FaceRecognition extends Application implements Initializable {
 
         lvVideoSources.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
             videoSourceSelectedItem = newValue.intValue();
+            if (videoSourceSelectedItem == -1) return;
             VideoSourceSettings settings = sourceList.getItems().get(newValue.intValue());
             tfURL.setText(settings.getUrl());
 
@@ -408,10 +409,16 @@ public class FaceRecognition extends Application implements Initializable {
                 });
             } else {
                 controller.setOnNewVideoSettings(vss -> {
+                    lvVideoSources.getSelectionModel().select(-1);
+
+                    lvVideoSources.getItems().add(storageIdx, vss.getName());
                     sourceList.getItems().add(storageIdx, vss);
                     if (sourceList.getItems().size() > storageIdx + 1) {
                         sourceList.getItems().remove(storageIdx + 1);
+                        lvVideoSources.getItems().remove(storageIdx + 1);
                     }
+
+                    lvVideoSources.getSelectionModel().select(storageIdx.intValue());
                 });
             }
 

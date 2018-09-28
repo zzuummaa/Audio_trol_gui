@@ -46,7 +46,12 @@ public class VideoSettingsController implements Initializable {
             stage.close();
         });
 
-        btApply.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> apply());
+        btApply.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+            VideoSourceSettings settings = apply();
+            if (onNewVideoSettings != null) {
+                onNewVideoSettings.accept(settings);
+            }
+        });
 
         cbVideoSourceType.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue.intValue() == 0) {
