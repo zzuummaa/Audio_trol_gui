@@ -372,7 +372,7 @@ public class FaceRecognition extends Application implements Initializable {
     @Override
     public void start(Stage stage) throws IOException {
         av_log_set_level(MAX_PRIORITY);
-        Parent root = FXMLLoader.load(getClass().getResource("face_recognition.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("fxml/face_recognition.fxml"));
 
         stage.setOnCloseRequest(event -> {
             System.out.println("Realise resources...");
@@ -396,7 +396,7 @@ public class FaceRecognition extends Application implements Initializable {
     private void createVideoSettingsWindow(Integer storageIdx, ResourceBundle resources, boolean isUpdateLV) {
         Parent root;
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("video_settings.fxml"), resources);
+            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("fxml/video_settings.fxml"), resources);
             root = loader.load();
             VideoSettingsController controller = loader.getController();
             Stage newWindow = new Stage();
@@ -438,7 +438,7 @@ public class FaceRecognition extends Application implements Initializable {
     private void createAppSettingsWindow(ResourceBundle resources) {
         Parent root;
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("app_settings.fxml"), resources);
+            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("fxml/app_settings.fxml"), resources);
             root = loader.load();
             AppSettingsController controller = loader.getController();
             Stage newWindow = new Stage();
