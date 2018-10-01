@@ -1,55 +1,27 @@
-import com.sun.javafx.scene.control.skin.LabeledText;
-import io.reactivex.Observable;
-import io.reactivex.disposables.Disposable;
 import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.MouseButton;
+import javafx.scene.control.Button;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Separator;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import javafx.util.Pair;
 import org.controlsfx.control.NotificationPane;
-import ru.zuma.rx.RxClassifier;
-import ru.zuma.rx.RxVideoSource2;
-import ru.zuma.utils.ConsoleUtil;
-import ru.zuma.utils.ImageMarker;
-import ru.zuma.utils.ImageProcessor;
-import ru.zuma.video.CameraVideoSource;
-import ru.zuma.video.HttpVideoSource;
-import ru.zuma.video.VideoSourceInterface;
-import serialization.Serializer;
-import serialization.model.VideoSourceSettings;
-import serialization.model.VideoSourceSettingsList;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static java.lang.Thread.MAX_PRIORITY;
-import static org.bytedeco.javacpp.avutil.*;
-import static org.bytedeco.javacpp.opencv_core.Mat;
-import static org.bytedeco.javacpp.opencv_core.RectVector;
-import static serialization.model.VideoSourceSettings.SourceTypes;
-import static serialization.model.VideoSourceSettings.SourceTypes.CAMERA;
-import static serialization.model.VideoSourceSettings.SourceTypes.PATH_OR_URL;
+import static org.bytedeco.javacpp.avutil.av_log_set_level;
 
 public class FaceRecognition extends Application implements Initializable {
 
@@ -86,6 +58,7 @@ public class FaceRecognition extends Application implements Initializable {
     private Button btSSH;
 
     private NotificationPane notificationPane;
+    private VideoViewController videoViewController;
 
     public static void main(String[] args) {
         launch(args);
@@ -94,7 +67,7 @@ public class FaceRecognition extends Application implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-        VideoViewController videoViewController = createVideoView(spCenter);
+        videoViewController = createVideoView(spCenter);
         createVideoListView(spLeft, videoViewController);
 
         btVideo.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
@@ -156,15 +129,12 @@ public class FaceRecognition extends Application implements Initializable {
         stage.setOnCloseRequest(event -> {
             System.out.println("Realise resources...");
 
-            // TODO Realise resources from VideoViewController
-//            if (rxVideoSource != null) {
-//                rxVideoSource.onComplete();
-//            }
-//            if (executor != null) {
-//                executor.shutdownNow();
-//            }
+            if (videoViewController != null) {
+                videoViewController.realiseClassificationModel();
+            }
 
             System.out.println("Goodbye!");
+            System.exit(0);
         });
 
         Scene scene = new Scene(root);

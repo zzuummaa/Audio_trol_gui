@@ -10,14 +10,18 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.util.Pair;
 import org.bytedeco.javacpp.opencv_core;
+import org.bytedeco.javacv.Java2DFrameConverter;
+import org.bytedeco.javacv.OpenCVFrameConverter;
 import ru.zuma.rx.RxVideoSource2;
 import ru.zuma.utils.ImageMarker;
 import ru.zuma.utils.ImageProcessor;
 import serialization.model.VideoSourceSettings;
 
+import java.awt.image.BufferedImage;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicReference;
@@ -51,12 +55,19 @@ public class VideoViewController implements VideoViewInterface, Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+
+        // Buffers for images
+        final WritableImage[] image = new WritableImage[1];
+        final OpenCVFrameConverter.ToMat matConv = new OpenCVFrameConverter.ToMat();
+        final Java2DFrameConverter biConv = new Java2DFrameConverter();
+
         classificationModel = new ClassificationModel(observable -> {
+
             observable.subscribe(pair -> {
                 ImageMarker.markRects(pair.getKey(), pair.getValue());
-                Image image = SwingFXUtils.toFXImage(ImageProcessor.toBufferedImage(pair.getKey()), null);
-
-                Platform.runLater(() -> imageView.setImage(image));
+                BufferedImage bufferedImage = biConv.getBufferedImage(matConv.convert(pair.getKey()));
+                image[0] = SwingFXUtils.toFXImage(bufferedImage, image[0]);
+                Platform.runLater(() -> imageView.setImage(image[0]));
             }, th -> {}, () -> {
                 Platform.runLater(() -> {
                     imageView.setImage(null);
@@ -125,5 +136,9 @@ public class VideoViewController implements VideoViewInterface, Initializable {
                 //stage.sizeToScene();
             });
         }));
+    }
+
+    public void realiseClassificationModel() {
+        classificationModel.realise();
     }
 }

@@ -1,14 +1,9 @@
 import io.reactivex.Observable;
 import javafx.application.Platform;
-import javafx.embed.swing.SwingFXUtils;
-import javafx.scene.image.Image;
 import javafx.util.Pair;
-import org.bytedeco.javacpp.opencv_core;
 import ru.zuma.rx.RxClassifier;
 import ru.zuma.rx.RxVideoSource2;
 import ru.zuma.utils.ConsoleUtil;
-import ru.zuma.utils.ImageMarker;
-import ru.zuma.utils.ImageProcessor;
 import ru.zuma.video.CameraVideoSource;
 import ru.zuma.video.HttpVideoSource;
 import ru.zuma.video.VideoSourceInterface;
@@ -20,7 +15,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-import static org.bytedeco.javacpp.opencv_core.*;
+import static org.bytedeco.javacpp.opencv_core.Mat;
+import static org.bytedeco.javacpp.opencv_core.RectVector;
 import static serialization.model.VideoSourceSettings.SourceTypes.CAMERA;
 import static serialization.model.VideoSourceSettings.SourceTypes.PATH_OR_URL;
 
@@ -127,5 +123,14 @@ public class ClassificationModel {
 
     public int getDefaultTimeout() {
         return defaultTimeout;
+    }
+
+    public void realise() {
+        if (rxVideoSource != null) {
+            rxVideoSource.onComplete();
+        }
+        if (executor != null) {
+            executor.shutdownNow();
+        }
     }
 }
