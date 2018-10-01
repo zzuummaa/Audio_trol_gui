@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.collections.FXCollections?>
+<?import javafx.scene.image.ImageView?>
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="VideoViewController">
+	<VBox fx:id="vbox" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+		<padding>
+			<Insets left="12" right="12" top="12" />
+		</padding>
+		<HBox fx:id="high" alignment="CENTER_RIGHT">
+			<Label fx:id="lbFPS" text="FPS " />
+		</HBox>
+
+		<GridPane maxWidth="1.7976931348623157E308">
+
+			<Label alignment="CENTER" text="Источник видео:" GridPane.columnIndex="0" GridPane.rowIndex="0">
+				<GridPane.margin>
+					<Insets bottom="8" right="16" />
+				</GridPane.margin>
+			</Label>
+			<ComboBox fx:id="cbVideoSourceType" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="0">
+				<GridPane.margin>
+					<Insets bottom="8" right="16" />
+				</GridPane.margin>
+				<items>
+					<FXCollections fx:id="videoSourceTypes" fx:factory="observableArrayList">
+						<String fx:value="Камера" />
+						<String fx:value="Файл или URL" />
+					</FXCollections>
+				</items>
+			</ComboBox>
+			<Label alignment="CENTER" text="URL или путь:" GridPane.columnIndex="0" GridPane.rowIndex="1">
+				<GridPane.margin>
+					<Insets bottom="8" right="16" />
+				</GridPane.margin>
+			</Label>
+			<TextField fx:id="tfURL" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1">
+				<GridPane.margin>
+					<Insets bottom="8" right="16" />
+				</GridPane.margin>
+			</TextField>
+			<Button fx:id="btLoad" minWidth="70" text="Загрузить" GridPane.columnIndex="2" GridPane.rowIndex="1">
+				<GridPane.margin>
+					<Insets bottom="8" />
+				</GridPane.margin>
+			</Button>
+			<Label alignment="CENTER" text="Статус:" GridPane.columnIndex="0" GridPane.rowIndex="2">
+				<GridPane.margin>
+					<Insets bottom="8" right="16" />
+				</GridPane.margin>
+			</Label>
+			<Label fx:id="lbVideoPlayingStatus" GridPane.columnIndex="1" GridPane.rowIndex="2">
+				<GridPane.margin>
+					<Insets bottom="8" right="16" />
+				</GridPane.margin>
+			</Label>
+			<columnConstraints>
+				<ColumnConstraints />
+				<ColumnConstraints />
+				<ColumnConstraints />
+			</columnConstraints>
+			<rowConstraints>
+				<RowConstraints />
+				<RowConstraints />
+				<RowConstraints />
+			</rowConstraints>
+
+		</GridPane>
+
+		<ImageView fx:id="imageView" />
+	</VBox>
+	<padding>
+		<Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
+	</padding>
+</AnchorPane>

@@ -15,6 +15,10 @@ public class VideoSourceSettings {
     private String timeout;
 
     public VideoSourceSettings() {
+        this.type = SourceTypes.PATH_OR_URL;
+        this.timeout = "0";
+        this.url = "";
+        this.name = "";
     }
 
     public VideoSourceSettings(String name, SourceTypes type, String url, String timeout) {

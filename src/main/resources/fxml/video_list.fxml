@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<?import java.net.URL?>
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="VideoListController">
+
+	<Label text="Источники видео" textAlignment="CENTER" AnchorPane.leftAnchor="16.0" AnchorPane.topAnchor="0.0">
+		<font>
+			<Font size="16.0"/>
+		</font>
+	</Label>
+	<Button fx:id="btAddVideo" text="Добавить" AnchorPane.leftAnchor="156.0" AnchorPane.topAnchor="0.0"/>
+	<ListView fx:id="lvVideoSources" stylesheets="fxml/list_view_style.css" AnchorPane.bottomAnchor="0.0"
+	          AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="36.0">
+		<contextMenu>
+			<ContextMenu>
+				<items>
+					<MenuItem fx:id="cmVideoSourcesChange" text="Изменить"/>
+					<MenuItem fx:id="cmVideoSourcesDelete" text="Удалить"/>
+				</items>
+			</ContextMenu>
+		</contextMenu>
+	</ListView>
+	<padding>
+		<Insets top="16.0"/>
+	</padding>
+</AnchorPane>
