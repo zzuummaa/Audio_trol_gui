@@ -133,4 +133,8 @@ public class ClassificationModel {
             executor.shutdownNow();
         }
     }
+
+    public RxVideoSource2 getVideoSource() {
+        return rxVideoSource;
+    }
 }

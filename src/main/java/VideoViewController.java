@@ -56,18 +56,13 @@ public class VideoViewController implements VideoViewInterface, Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-        // Buffers for images
-        final WritableImage[] image = new WritableImage[1];
-        final OpenCVFrameConverter.ToMat matConv = new OpenCVFrameConverter.ToMat();
-        final Java2DFrameConverter biConv = new Java2DFrameConverter();
-
+        MatToFXConverter converter = new MatToFXConverter();
         classificationModel = new ClassificationModel(observable -> {
+            initImageViewDimensions(classificationModel.getVideoSource());
 
             observable.subscribe(pair -> {
                 ImageMarker.markRects(pair.getKey(), pair.getValue());
-                BufferedImage bufferedImage = biConv.getBufferedImage(matConv.convert(pair.getKey()));
-                image[0] = SwingFXUtils.toFXImage(bufferedImage, image[0]);
-                Platform.runLater(() -> imageView.setImage(image[0]));
+                Platform.runLater(() -> imageView.setImage(converter.toFXImage(pair.getKey())));
             }, th -> {}, () -> {
                 Platform.runLater(() -> {
                     imageView.setImage(null);
