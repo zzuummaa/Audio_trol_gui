@@ -1,4 +1,5 @@
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -13,7 +14,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import org.controlsfx.control.NotificationPane;
 
 import java.io.IOException;
@@ -26,6 +26,7 @@ import static org.bytedeco.javacpp.avutil.av_log_set_level;
 public class FaceRecognition extends Application implements Initializable {
 
     private static Stage stage;
+    private static VideoViewController videoViewController;
 
     @FXML
     private ScrollPane spLeft;
@@ -58,7 +59,6 @@ public class FaceRecognition extends Application implements Initializable {
     private Button btSSH;
 
     private NotificationPane notificationPane;
-    private VideoViewController videoViewController;
 
     public static void main(String[] args) {
         launch(args);
@@ -79,10 +79,7 @@ public class FaceRecognition extends Application implements Initializable {
             //handleLeftDropMenuItemClick(btSSH);
         });
 
-        btExit.setOnAction(event -> {
-            stage.getOnCloseRequest().handle(new WindowEvent(stage, WindowEvent.WINDOW_CLOSE_REQUEST));
-            stage.close();
-        });
+        btExit.setOnAction(event -> stage.hide());
 
         btSettings.setOnAction(event ->
             createAppSettingsWindow(resources)
@@ -126,15 +123,10 @@ public class FaceRecognition extends Application implements Initializable {
         av_log_set_level(MAX_PRIORITY);
         Parent root = FXMLLoader.load(getClass().getResource("fxml/face_recognition.fxml"));
 
-        stage.setOnCloseRequest(event -> {
-            System.out.println("Realise resources...");
-
-            if (videoViewController != null) {
-                videoViewController.realiseClassificationModel();
-            }
-
+        stage.setOnHidden(event -> {
+            videoViewController.onExitApp(event);
+            Platform.exit();
             System.out.println("Goodbye!");
-            System.exit(0);
         });
 
         Scene scene = new Scene(root);

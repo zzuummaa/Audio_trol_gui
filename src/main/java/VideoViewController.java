@@ -1,31 +1,22 @@
-import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 import javafx.application.Platform;
-import javafx.embed.swing.SwingFXUtils;
+import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
-import javafx.util.Pair;
-import org.bytedeco.javacpp.opencv_core;
-import org.bytedeco.javacv.Java2DFrameConverter;
-import org.bytedeco.javacv.OpenCVFrameConverter;
 import ru.zuma.rx.RxVideoSource2;
 import ru.zuma.utils.ImageMarker;
-import ru.zuma.utils.ImageProcessor;
 import serialization.model.VideoSourceSettings;
 
-import java.awt.image.BufferedImage;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
 
 import static serialization.model.VideoSourceSettings.SourceTypes.CAMERA;
 import static serialization.model.VideoSourceSettings.SourceTypes.PATH_OR_URL;
@@ -133,7 +124,8 @@ public class VideoViewController implements VideoViewInterface, Initializable {
         }));
     }
 
-    public void realiseClassificationModel() {
-        classificationModel.realise();
+    public void onExitApp(Event event) {
+        System.out.println("Release video resources...");
+        classificationModel.release();
     }
 }

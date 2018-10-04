@@ -125,7 +125,7 @@ public class ClassificationModel {
         return defaultTimeout;
     }
 
-    public void realise() {
+    public void release() {
         if (rxVideoSource != null) {
             rxVideoSource.onComplete();
         }

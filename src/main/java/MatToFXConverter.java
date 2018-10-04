@@ -3,6 +3,7 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.image.WritablePixelFormat;
 import org.bytedeco.javacpp.opencv_core;
 
+import static org.bytedeco.javacpp.opencv_core.*;
 import static org.bytedeco.javacpp.opencv_core.CV_16U;
 import static org.bytedeco.javacpp.opencv_core.CV_8U;
 import static org.bytedeco.javacpp.opencv_imgproc.COLOR_BGR2BGRA;
@@ -16,27 +17,27 @@ public class MatToFXConverter {
     public MatToFXConverter() {
     }
 
-    public WritableImage toFXImage(opencv_core.Mat m) {
+    public synchronized WritableImage toFXImage(Mat m) {
         if (m == null || m.empty()) return null;
 
-        opencv_core.Mat m_16 = null;
+        Mat m_16 = null;
         if (m.depth() == CV_8U) {
 
         } else if (m.depth() == CV_16U) {
-            m_16 = new opencv_core.Mat();
+            m_16 = new Mat();
             m.convertTo(m_16, CV_8U);
             m = m_16;
         } else {
             return null;
         }
 
-        opencv_core.Mat m_bgra = null;
+        Mat m_bgra = null;
         if (m.channels() == 1) {
-            m_bgra = new opencv_core.Mat();
+            m_bgra = new Mat();
             cvtColor(m, m_bgra, COLOR_GRAY2BGRA);
             m = m_bgra;
         } else if (m.channels() == 3) {
-            m_bgra = new opencv_core.Mat();
+            m_bgra = new Mat();
             cvtColor(m, m_bgra, COLOR_BGR2BGRA);
             m = m_bgra;
         } else if (m.channels() == 4) {
