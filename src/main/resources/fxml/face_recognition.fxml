@@ -1,31 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.String?>
-<?import javafx.collections.FXCollections?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.Group?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.ContextMenu?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.ToolBar?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
 
 <BorderPane prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="FaceRecognition">
 
@@ -57,25 +42,6 @@
     <center>
         <SplitPane dividerPositions="0.25">
             <items>
-                <!--<ScrollPane>-->
-                    <!--<content>-->
-                        <!--<AnchorPane >-->
-                            <!--<VBox fx:id="vbLeftDropMenuSSH" prefHeight="-Infinity">-->
-                                <!--<AnchorPane>-->
-                                    <!--<VBox.margin>-->
-                                        <!--<Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />-->
-                                    <!--</VBox.margin>-->
-                                    <!--<Label text="Конфигурации SSH" AnchorPane.leftAnchor="0">-->
-                                        <!--<font>-->
-                                            <!--<Font size="16.0" />-->
-                                        <!--</font>-->
-                                    <!--</Label>-->
-                                    <!--<Button fx:id="btAddSSH" text="Добавить" AnchorPane.rightAnchor="0" />-->
-                                <!--</AnchorPane>-->
-                            <!--</VBox>-->
-                        <!--</AnchorPane>-->
-                    <!--</content>-->
-                <!--</ScrollPane>-->
                 <ScrollPane fx:id="spLeft" fitToHeight="true" fitToWidth="true">
                 </ScrollPane>
                 <ScrollPane fx:id="spCenter" fitToHeight="true" fitToWidth="true">
@@ -85,11 +51,11 @@
     </center>
     <left>
         <HBox>
-            <ToolBar orientation="VERTICAL">
-                <Group><Button fx:id="btVideo" rotate="-90.0" text="Видео" /></Group>
-                <Group><Button fx:id="btSSH" rotate="-90.0" text="SSH" /></Group>
-            </ToolBar>
-            <Separator orientation="VERTICAL" />
+            <!--<ToolBar fx:id="tbLeft" orientation="VERTICAL">-->
+                <!--<Group><Button fx:id="btVideo" rotate="-90.0" text="Видео" /></Group>-->
+                <!--<Group><Button fx:id="btSSH" rotate="-90.0" text="SSH" /></Group>-->
+            <!--</ToolBar>-->
+            <TabPane fx:id="tpLeft" stylesheets="@left_tab_style.css" rotateGraphic="true" side="LEFT" />
         </HBox>
     </left>
 

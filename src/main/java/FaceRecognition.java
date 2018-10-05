@@ -5,10 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Separator;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
@@ -27,6 +24,12 @@ public class FaceRecognition extends Application implements Initializable {
 
     private static Stage stage;
     private static VideoViewController videoViewController;
+
+    @FXML
+    private TabPane tpLeft;
+
+    @FXML
+    private ToolBar tbLeft;
 
     @FXML
     private ScrollPane spLeft;
@@ -52,13 +55,11 @@ public class FaceRecognition extends Application implements Initializable {
     @FXML
     private Separator spLeftDropMenu;
 
-    @FXML
-    private Button btVideo;
-
-    @FXML
-    private Button btSSH;
+    private Tab tabVideo;
+    private Tab tabSSH;
 
     private NotificationPane notificationPane;
+    private DraggingTabPaneSupport draggingTabPaneSupport;
 
     public static void main(String[] args) {
         launch(args);
@@ -70,52 +71,17 @@ public class FaceRecognition extends Application implements Initializable {
         videoViewController = createVideoView(spCenter);
         createVideoListView(spLeft, videoViewController);
 
-        btVideo.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
-            handleLeftDropMenuItemClick(btVideo);
-        });
-
-        btSSH.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
-            // TODO refactor logic of left menu
-            //handleLeftDropMenuItemClick(btSSH);
-        });
+        tabVideo = new Tab("Видео");
+        tabSSH = new Tab("SSH");
+        tpLeft.getTabs().addAll(tabVideo, tabSSH);
+        draggingTabPaneSupport = new DraggingTabPaneSupport();
+        draggingTabPaneSupport.addSupport(tpLeft);
 
         btExit.setOnAction(event -> stage.hide());
 
         btSettings.setOnAction(event ->
             createAppSettingsWindow(resources)
         );
-    }
-
-    private void handleLeftDropMenuItemClick(Button bt) {
-        if (bt == btVideo) {
-            if (vbLeftDropMenuVideo.isVisible()) {
-                vbLeftDropMenuVideo.setManaged(false);
-                vbLeftDropMenuVideo.setVisible(false);
-                spLeftDropMenu.setVisible(false);
-            } else {
-                vbLeftDropMenuVideo.setManaged(true);
-                vbLeftDropMenuVideo.setVisible(true);
-                spLeftDropMenu.setVisible(true);
-
-                vbLeftDropMenuSSH.setManaged(false);
-                vbLeftDropMenuSSH.setVisible(false);
-            }
-//            stage.sizeToScene();
-        }
-        if (bt == btSSH) {
-            if (vbLeftDropMenuSSH.isVisible()) {
-                vbLeftDropMenuSSH.setManaged(false);
-                vbLeftDropMenuSSH.setVisible(false);
-                spLeftDropMenu.setVisible(false);
-            } else {
-                vbLeftDropMenuSSH.setManaged(true);
-                vbLeftDropMenuSSH.setVisible(true);
-                spLeftDropMenu.setVisible(true);
-
-                vbLeftDropMenuVideo.setManaged(false);
-                vbLeftDropMenuVideo.setVisible(false);
-            }
-        }
     }
 
     @Override
