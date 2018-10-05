@@ -9,6 +9,7 @@ import ru.zuma.video.HttpVideoSource;
 import ru.zuma.video.VideoSourceInterface;
 import serialization.model.VideoSourceSettings;
 
+import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -76,7 +77,12 @@ public class ClassificationModel {
 
             synchronized (RxVideoSource2.class) {
                 rxVideoSource = new RxVideoSource2(videoSource);
-                rxClassifier = ConsoleUtil.createClassifier();
+                try {
+                    rxClassifier = ConsoleUtil.createClassifier();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Platform.runLater(() -> status.accept("Не возможно загрузить классификатор"));
+                }
                 showInImageView(rxVideoSource, videoSource, rxClassifier);
                 Platform.runLater(() -> status.accept("Видео проигрывается"));
             }

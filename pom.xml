@@ -42,7 +42,7 @@
             <!-- resource processsing with a different output directory
                  for logback.xml -->
             <resource>
-                <directory>src/main/resources</directory>
+                <directory>${basedir}/src/main/resources</directory>
                 <includes>
                     <include>*</include>
                 </includes>
@@ -52,7 +52,7 @@
             </resource>
 
             <resource>
-                <directory>C:/Users/Stephan/IdeaProjects/Audio_trol/src/main/resources</directory>
+                <directory>../Audio_trol/src/main/resources</directory>
                 <includes>
                     <include>*</include>
                 </includes>
@@ -213,7 +213,7 @@
                         </goals>
                         <configuration>
                             <sources>
-                                <source>C:/Users/Stephan/IdeaProjects/Audio_trol/src/main/java</source>
+                                <source>${basedir}/src/main/java</source>
                             </sources>
                         </configuration>
                     </execution>

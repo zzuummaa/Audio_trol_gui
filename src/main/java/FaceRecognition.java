@@ -73,6 +73,10 @@ public class FaceRecognition extends Application implements Initializable {
 
         tabVideo = new Tab("Видео");
         tabSSH = new Tab("SSH");
+
+        tabVideo.setClosable(false);
+        tabSSH.setClosable(false);
+
         tpLeft.getTabs().addAll(tabVideo, tabSSH);
         draggingTabPaneSupport = new DraggingTabPaneSupport();
         draggingTabPaneSupport.addSupport(tpLeft);
