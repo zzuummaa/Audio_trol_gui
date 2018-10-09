@@ -43,11 +43,12 @@ public class VideoListController implements Initializable {
     private int videoSourceSelectedItem = -1;
 
     private VideoViewInterface videoView;
+    private Stage stage;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         btAddVideo.addEventFilter(MouseEvent.MOUSE_CLICKED, event ->
-            createVideoSettingsWindow(stage(event), null, resources, true)
+            createVideoSettingsWindow(stage, null, resources, true)
         );
 
         sourceList = Serializer.getInstance().deserializeVideoSourceSettingsList();
@@ -70,7 +71,7 @@ public class VideoListController implements Initializable {
         cmVideoSourcesChange.setOnAction(event -> {
             // TODO make normal double click handling
             if (videoSourceSelectedItem != -1) {
-                createVideoSettingsWindow(stage(event), videoSourceSelectedItem, resources, false);
+                createVideoSettingsWindow(stage, videoSourceSelectedItem, resources, false);
             }
         });
 
@@ -102,8 +103,8 @@ public class VideoListController implements Initializable {
         });
     }
 
-    private Window stage(Event event) {
-        return ((Node)event.getTarget()).getScene().getWindow();
+    public void setStage(Stage stage) {
+        this.stage = stage;
     }
 
     public void setVideoView(VideoViewInterface videoView) {
@@ -119,25 +120,16 @@ public class VideoListController implements Initializable {
             Stage newWindow = new Stage();
             controller.setStage(newWindow);
             controller.setStorageIdx(storageIdx);
-            if (isUpdateLV) {
-                controller.setOnNewVideoSettings(vss -> {
-                    lvVideoSources.getItems().add(vss.getName());
-                    sourceList.getItems().add(vss);
-                });
-            } else {
-                controller.setOnNewVideoSettings(vss -> {
-                    lvVideoSources.getSelectionModel().select(-1);
-
-                    lvVideoSources.getItems().add(storageIdx, vss.getName());
-                    sourceList.getItems().add(storageIdx, vss);
-                    if (sourceList.getItems().size() > storageIdx + 1) {
-                        sourceList.getItems().remove(storageIdx + 1);
-                        lvVideoSources.getItems().remove(storageIdx + 1);
-                    }
-
-                    lvVideoSources.getSelectionModel().select(storageIdx.intValue());
-                });
-            }
+            controller.setOnNewVideoSettings(vss -> {
+                if (vss.first() == null) {
+                    videoSourceItems.add(vss.second().getName());
+                    sourceList.getItems().add(vss.second());
+                } else {
+                    videoSourceItems.remove(vss.first().intValue());
+                    videoSourceItems.add(vss.first(), vss.second().getName());
+                    lvVideoSources.getSelectionModel().select(vss.first().intValue());
+                }
+            });
 
             newWindow.setTitle("Конфигурация видеоисточника");
             newWindow.setScene(new Scene(root));

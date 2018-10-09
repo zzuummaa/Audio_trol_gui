@@ -139,6 +139,7 @@ public class FaceRecognition extends Application implements Initializable {
             // Give the controller access to the main app.
             VideoListController controller = loader.getController();
             controller.setVideoView(videoView);
+            controller.setStage(stage);
 
         } catch (IOException e) {
             e.printStackTrace();

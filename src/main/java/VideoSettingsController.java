@@ -6,6 +6,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
+import ru.zuma.utils.Pair;
 import serialization.Serializer;
 import serialization.model.VideoSourceSettings;
 
@@ -29,7 +30,7 @@ public class VideoSettingsController implements Initializable {
 
     private Stage stage;
 
-    private Consumer<VideoSourceSettings> onNewVideoSettings;
+    private Consumer<Pair<Integer, VideoSourceSettings>> onNewVideoSettings;
 
     private Integer storageIdx;
 
@@ -41,7 +42,7 @@ public class VideoSettingsController implements Initializable {
         btOk.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             VideoSourceSettings settings = apply();
             if (onNewVideoSettings != null) {
-                onNewVideoSettings.accept(settings);
+                onNewVideoSettings.accept(new Pair<>(storageIdx, settings));
             }
             stage.close();
         });
@@ -49,7 +50,7 @@ public class VideoSettingsController implements Initializable {
         btApply.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             VideoSourceSettings settings = apply();
             if (onNewVideoSettings != null) {
-                onNewVideoSettings.accept(settings);
+                onNewVideoSettings.accept(new Pair<>(storageIdx, settings));
             }
         });
 
@@ -65,7 +66,7 @@ public class VideoSettingsController implements Initializable {
         cbVideoSourceType.getSelectionModel().selectFirst();
     }
 
-    void setOnNewVideoSettings(Consumer<VideoSourceSettings> onNewVideoSettings) {
+    void setOnNewVideoSettings(Consumer<Pair<Integer, VideoSourceSettings>> onNewVideoSettings) {
         this.onNewVideoSettings = onNewVideoSettings;
     }
 
@@ -75,7 +76,7 @@ public class VideoSettingsController implements Initializable {
             if (event.getCode() == KeyCode.ENTER) {
                 VideoSourceSettings settings = apply();
                 if (onNewVideoSettings != null) {
-                    onNewVideoSettings.accept(settings);
+                    onNewVideoSettings.accept(new Pair<>(storageIdx, settings));
                 }
                 stage.close();
             }
