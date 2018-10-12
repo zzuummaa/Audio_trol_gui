@@ -121,13 +121,15 @@ public class VideoListController implements Initializable {
             controller.setStage(newWindow);
             controller.setStorageIdx(storageIdx);
             controller.setOnNewVideoSettings(vss -> {
-                if (vss.first() == null) {
+                if (vss.first().intValue() == videoSourceItems.size()) {
                     videoSourceItems.add(vss.second().getName());
                     sourceList.getItems().add(vss.second());
                 } else {
                     videoSourceItems.remove(vss.first().intValue());
                     videoSourceItems.add(vss.first(), vss.second().getName());
                     lvVideoSources.getSelectionModel().select(vss.first().intValue());
+                    sourceList.getItems().remove(vss.first().intValue());
+                    sourceList.getItems().add(vss.first(), vss.second());
                 }
             });
 
